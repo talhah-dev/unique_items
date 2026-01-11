@@ -32,7 +32,7 @@ const slides: Slide[] = [
         title: "Unique Items Watches",
         subtitle: "Timeless Style. Everyday Confidence.",
         desc: "Explore premium watches designed for comfort, durability, and a clean modern look.",
-        image: "/images/hero/watch-1.png",
+        image: "https://images.unsplash.com/photo-1524805444758-089113d48a6d?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8d2F0Y2hzfGVufDB8fDB8fHww",
         ctaPrimary: { label: "Shop Now", href: "/shop" },
         ctaSecondary: { label: "View Collections", href: "/collections" },
         align: "left",
@@ -43,7 +43,7 @@ const slides: Slide[] = [
         title: "Minimal. Modern. Bold.",
         subtitle: "A watch that matches your vibe.",
         desc: "Choose from classic leather, stainless steel, and sporty designs—made for every moment.",
-        image: "/images/hero/watch-2.png",
+        image: "https://images.unsplash.com/photo-1630512731371-a3747ab932ed?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDY2fHx8ZW58MHx8fHx8",
         ctaPrimary: { label: "Explore New", href: "/new" },
         ctaSecondary: { label: "Best Sellers", href: "/best-sellers" },
         align: "left",
@@ -54,7 +54,7 @@ const slides: Slide[] = [
         title: "Built To Last",
         subtitle: "Premium look. Reliable performance.",
         desc: "Quality materials and a refined finish—perfect for gifting or upgrading your daily style.",
-        image: "/images/hero/watch-3.png",
+        image: "https://images.unsplash.com/photo-1634140704051-58a787556cd1?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDEzOXx8fGVufDB8fHx8fA%3D%3D",
         ctaPrimary: { label: "Shop Gifts", href: "/gifts" },
         ctaSecondary: { label: "Learn More", href: "/about" },
         align: "left",
@@ -105,7 +105,7 @@ export default function HeroSlider() {
                                                 {s.title}
                                             </p>
 
-                                            <h1 className="text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-6xl">
+                                            <h1 className="text-4xl font-semibold tracking-tight leading-tight text-white sm:text-5xl lg:text-6xl">
                                                 {s.subtitle}
                                             </h1>
 
@@ -151,13 +151,14 @@ export default function HeroSlider() {
 
                                         <div className="relative mx-auto w-full max-w-[520px]">
                                             <div className="absolute -inset-6 rounded-[32px] bg-white/10 blur-2xl" />
-                                            <div className="relative overflow-hidden rounded-xl border border-white/15 bg-white/10 p-6 backdrop-blur sm:p-8">
-                                                <div className="relative mx-auto aspect-square w-full max-w-[420px]">
+                                            <div className="relative overflow-hidden rounded-xl border border-white/15 bg-white/10 p-5 backdrop-blur px-6">
+                                                <div className="relative mx-auto aspect-square w-full w-full">
                                                     <Image
                                                         src={s.image}
                                                         alt="Watch"
-                                                        fill
-                                                        className="object-contain drop-shadow-2xl"
+                                                        width={500}
+                                                        height={500}
+                                                        className="object-cover rounded-xl w-full h-full drop-shadow-2xl"
                                                     />
                                                 </div>
 

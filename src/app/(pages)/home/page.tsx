@@ -71,7 +71,7 @@ export default function HomePg() {
                         <div className="absolute inset-0 bg-gradient-to-b from-white via-white to-zinc-50" />
                     </div>
 
-                    <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
+                    <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-22">
                         <div className="grid items-center gap-12 lg:grid-cols-2">
                             <div className="space-y-6">
                                 <Badge variant="secondary" className="rounded-full px-4 py-1 text-sm">
@@ -105,7 +105,11 @@ export default function HomePg() {
                                 </div>
                             </div>
 
-                            <div className="relative">
+                            <div className="w-full overflow-hidden">
+                                <Image src={"https://images.unsplash.com/photo-1633599925393-a4af0a650546?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"} width={700} height={700} alt="" className="w-full rounded-2xl object-cover md:h-[35rem] h-auto" />
+                            </div>
+
+                            {/* <div className="relative">
                                 <div className="relative mx-auto max-w-xl">
                                     <div className="absolute -inset-6 rounded-[28px] bg-gradient-to-b from-black/10 to-transparent blur-2xl" />
                                     <div className="relative z-10 overflow-hidden rounded-[28px] border bg-white shadow-xl">
@@ -174,7 +178,7 @@ export default function HomePg() {
                                     <div className="pointer-events-none absolute -bottom-10 -left-10 h-32 w-32 rounded-full border bg-white/50 backdrop-blur" />
                                     <div className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full border bg-white/50 backdrop-blur" />
                                 </div>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 </section>
@@ -183,7 +187,53 @@ export default function HomePg() {
 
                 <Testimonials />
 
-                <div className="w-full max-w-7xl lg:mx-auto px-4 md:pt-10 pt-8 md:pb-28 pb-16">
+                <section className="relative isolate overflow-hidden">
+                    <div className="absolute inset-0 -z-10">
+                        <Image
+                            src="https://images.unsplash.com/photo-1633599925393-a4af0a650546?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                            alt="Premium watches"
+                            fill
+                            className="h-full w-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black/60" />
+                    </div>
+
+                    <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
+                        <div className="mx-auto max-w-3xl text-center text-white space-y-6">
+                            <span className="inline-flex items-center rounded-full bg-white/10 px-4 py-1 text-sm backdrop-blur">
+                                Limited Time Collection
+                            </span>
+
+                            <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl">
+                                Elevate your style with a watch that lasts
+                            </h2>
+
+                            <p className="text-base leading-relaxed text-white/80 sm:text-lg">
+                                Discover modern, premium watches crafted for everyday wear and special
+                                moments. Designed to look elegant and feel comfortable.
+                            </p>
+
+                            <div className="flex flex-col gap-3 sm:flex-row sm:justify-center sm:gap-4 pt-4">
+                                <a
+                                    href="/shop"
+                                    className="inline-flex h-11 items-center justify-center rounded-xl bg-white px-6 text-sm font-medium text-zinc-900 hover:bg-white/90"
+                                >
+                                    Shop Watches
+                                </a>
+
+                                <a
+                                    href="/collections"
+                                    className="inline-flex h-11 items-center justify-center rounded-xl border border-white/40 px-6 text-sm font-medium text-white hover:bg-white/10"
+                                >
+                                    View Collections
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+
+                <div className="w-full max-w-7xl lg:mx-auto px-4 md:pt-28 pt-16 md:pb-28 pb-16">
                     <div className="grid gap-10 lg:grid-cols-3 lg:items-start">
                         {/* Left Content */}
                         <div className="space-y-5">
