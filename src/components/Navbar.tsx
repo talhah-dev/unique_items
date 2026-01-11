@@ -50,7 +50,7 @@ export default function Navbar() {
                 </nav>
 
                 <div className="hidden items-center gap-2 md:flex">
-                    <div className="relative w-[260px]">
+                    <div className="relative w-[260px] md:mr-10">
                         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
                         <Input
                             placeholder="Search watches..."
@@ -58,13 +58,15 @@ export default function Navbar() {
                         />
                     </div>
 
-                    <Button variant="ghost" size="icon" className="rounded-xl">
+                    {/* <Button variant="ghost" size="icon" className="rounded-xl">
                         <User className="h-5 w-5" />
-                    </Button>
+                    </Button> */}
 
-                    <Button variant="ghost" size="icon" className="rounded-xl">
-                        <ShoppingBag className="h-5 w-5" />
-                    </Button>
+                    <Link href="/cart">
+                        <Button variant="ghost" size="icon" className="rounded-xl">
+                            <ShoppingBag className="h-5 w-5" />
+                        </Button>
+                    </Link>
 
                     <Button asChild className="h-10 rounded-xl px-4">
                         <Link href="/shop">Shop</Link>
@@ -73,10 +75,11 @@ export default function Navbar() {
 
                 <div className="flex items-center gap-2 md:hidden">
 
-                    <Button variant="ghost" size="icon" className="rounded-lg bg-zinc-100">
-                        <ShoppingBag className="h-5 w-5" />
-                    </Button>
-
+                    <Link href="/cart">
+                        <Button variant="ghost" size="icon" className="rounded-lg bg-zinc-100">
+                            <ShoppingBag className="h-5 w-5" />
+                        </Button>
+                    </Link>
                     <Sheet open={open} onOpenChange={setOpen}>
                         <SheetTrigger asChild>
                             <Button variant="outline" size="icon" className="rounded-lg">

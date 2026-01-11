@@ -41,7 +41,7 @@ const PRODUCTS: Product[] = [
         price: 3850,
         compareAt: 4250,
         inStock: true,
-        image: "/images/products/p1.jpg",
+        image: "https://images.unsplash.com/photo-1606391376558-31313ada3aa3?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDMzfHx8ZW58MHx8fHx8",
         href: "/products/p1",
         tag: "Best Seller",
     },
@@ -53,7 +53,7 @@ const PRODUCTS: Product[] = [
         price: 3650,
         compareAt: 4100,
         inStock: true,
-        image: "/images/products/p2.jpg",
+        image: "https://images.unsplash.com/photo-1606391376558-31313ada3aa3?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDMzfHx8ZW58MHx8fHx8",
         href: "/products/p2",
         tag: "New",
     },
@@ -65,7 +65,7 @@ const PRODUCTS: Product[] = [
         price: 3990,
         compareAt: 4490,
         inStock: true,
-        image: "/images/products/p3.jpg",
+        image: "https://images.unsplash.com/photo-1606391376558-31313ada3aa3?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDMzfHx8ZW58MHx8fHx8",
         href: "/products/p3",
     },
     {
@@ -76,7 +76,7 @@ const PRODUCTS: Product[] = [
         price: 2490,
         compareAt: 2990,
         inStock: false,
-        image: "/images/products/p4.jpg",
+        image: "https://images.unsplash.com/photo-1606391376558-31313ada3aa3?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDMzfHx8ZW58MHx8fHx8",
         href: "/products/p4",
         tag: "Sold Out",
     },
@@ -88,7 +88,7 @@ const PRODUCTS: Product[] = [
         price: 3290,
         compareAt: 3790,
         inStock: true,
-        image: "/images/products/p1.jpg",
+        image: "https://images.unsplash.com/photo-1606391376558-31313ada3aa3?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDMzfHx8ZW58MHx8fHx8",
         href: "/products/p5",
     },
     {
@@ -99,7 +99,7 @@ const PRODUCTS: Product[] = [
         price: 4190,
         compareAt: 4690,
         inStock: true,
-        image: "/images/products/p2.jpg",
+        image: "https://images.unsplash.com/photo-1606391376558-31313ada3aa3?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDMzfHx8ZW58MHx8fHx8",
         href: "/products/p6",
     },
     {
@@ -110,7 +110,7 @@ const PRODUCTS: Product[] = [
         price: 4590,
         compareAt: 4990,
         inStock: true,
-        image: "/images/products/p3.jpg",
+        image: "https://images.unsplash.com/photo-1606391376558-31313ada3aa3?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDMzfHx8ZW58MHx8fHx8",
         href: "/products/p7",
         tag: "Trending",
     },
@@ -122,7 +122,7 @@ const PRODUCTS: Product[] = [
         price: 2290,
         compareAt: 2690,
         inStock: true,
-        image: "/images/products/p4.jpg",
+        image: "https://images.unsplash.com/photo-1606391376558-31313ada3aa3?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDMzfHx8ZW58MHx8fHx8",
         href: "/products/p8",
     },
 ];
@@ -150,12 +150,6 @@ const STRAPS: { key: Strap; label: string }[] = [
     { key: "leather", label: "Leather" },
     { key: "steel", label: "Steel" },
     { key: "silicone", label: "Silicone" },
-];
-
-const SORTS = [
-    { key: "newest", label: "Newest" },
-    { key: "price_asc", label: "Price: Low to High" },
-    { key: "price_desc", label: "Price: High to Low" },
 ];
 
 function SidebarFilters({
@@ -190,14 +184,13 @@ function SidebarFilters({
     return (
         <div className="space-y-6">
             <div>
-                <div className="flex items-center justify-between">
-                    <p className="text-sm font-semibold text-zinc-900">Filters</p>
+                {/* <div className="flex items-center justify-between">
                     <Button variant="ghost" size="sm" className="h-8 px-2" onClick={clearAll}>
                         Clear
                     </Button>
-                </div>
+                </div> */}
 
-                <div className="mt-3 relative">
+                <div className=" relative">
                     <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
                     <Input
                         value={query}
@@ -219,7 +212,7 @@ function SidebarFilters({
                             type="button"
                             onClick={() => setCategory(c.key)}
                             className={cn(
-                                "w-full rounded-2xl border px-4 py-3 text-left text-sm font-medium transition",
+                                "w-full rounded-lg border px-4 py-3 text-left text-sm font-medium transition",
                                 category === c.key
                                     ? "border-zinc-900 bg-zinc-900 text-white"
                                     : "border-zinc-200 bg-white hover:bg-zinc-50"
@@ -244,17 +237,9 @@ function SidebarFilters({
                         <span className="text-zinc-600">{formatPKR(price[1])}</span>
                     </div>
                     <div className="mt-4">
-                        <Slider
-                            value={price}
-                            onValueChange={setPrice}
-                            min={minPrice}
-                            max={maxPrice}
-                            step={10}
-                        />
+                        <Slider value={price} onValueChange={setPrice} min={minPrice} max={maxPrice} step={10} />
                     </div>
-                    <p className="mt-3 text-xs text-zinc-500">
-                        Adjust the slider to filter by price.
-                    </p>
+                    <p className="mt-3 text-xs text-zinc-500">Adjust the slider to filter by price.</p>
                 </div>
             </div>
 
@@ -301,7 +286,7 @@ function SidebarFilters({
                             type="button"
                             onClick={() => setAvailability(a.key as Availability | "all")}
                             className={cn(
-                                "w-full rounded-xl border px-3 py-2 text-left text-sm transition",
+                                "w-full rounded-lg border px-3 py-2 text-left text-sm transition",
                                 availability === a.key
                                     ? "border-zinc-900 bg-zinc-900 text-white"
                                     : "border-zinc-200 bg-white hover:bg-zinc-50"
@@ -356,13 +341,9 @@ function ProductCard({ p }: { p: Product }) {
 
                 <div className="mt-2 flex items-center gap-2">
                     {typeof p.compareAt === "number" && (
-                        <span className="text-sm text-zinc-500 line-through">
-                            {formatPKR(p.compareAt)}
-                        </span>
+                        <span className="text-sm text-zinc-500 line-through">{formatPKR(p.compareAt)}</span>
                     )}
-                    <span className="text-sm font-semibold text-red-600">
-                        {formatPKR(p.price)}
-                    </span>
+                    <span className="text-sm font-semibold text-red-600">{formatPKR(p.price)}</span>
                     {p.tag && (
                         <Badge variant="secondary" className="ml-auto rounded-full">
                             {p.tag}
@@ -395,7 +376,6 @@ export default function ShopPage() {
     const [price, setPrice] = React.useState<number[]>([min, max]);
     const [strap, setStrap] = React.useState<Strap[]>([]);
     const [availability, setAvailability] = React.useState<Availability | "all">("all");
-    const [sort, setSort] = React.useState<(typeof SORTS)[number]["key"]>("newest");
 
     React.useEffect(() => {
         setPrice([min, max]);
@@ -407,7 +387,6 @@ export default function ShopPage() {
         setPrice([min, max]);
         setStrap([]);
         setAvailability("all");
-        setSort("newest");
     };
 
     const filtered = React.useMemo(() => {
@@ -428,11 +407,8 @@ export default function ShopPage() {
             list = list.filter((p) => (availability === "in" ? p.inStock : !p.inStock));
         }
 
-        if (sort === "price_asc") list.sort((a, b) => a.price - b.price);
-        if (sort === "price_desc") list.sort((a, b) => b.price - a.price);
-
         return list;
-    }, [category, query, price, strap, availability, sort]);
+    }, [category, query, price, strap, availability]);
 
     return (
         <UserWrapper>
@@ -457,11 +433,11 @@ export default function ShopPage() {
                                             Filters
                                         </Button>
                                     </SheetTrigger>
-                                    <SheetContent side="left" className="w-[340px]">
+                                    <SheetContent side="left" className="w-[340px] overflow-auto pb-5 px-4">
                                         <SheetHeader>
                                             <SheetTitle>Filters</SheetTitle>
                                         </SheetHeader>
-                                        <div className="mt-6">
+                                        <div className="">
                                             <SidebarFilters
                                                 category={category}
                                                 setCategory={setCategory}
@@ -480,26 +456,6 @@ export default function ShopPage() {
                                         </div>
                                     </SheetContent>
                                 </Sheet>
-
-                                <div className="flex items-center gap-2 rounded-xl border bg-white px-3 py-2">
-                                    <span className="text-sm text-zinc-600">Sort:</span>
-                                    <select
-                                        value={sort}
-                                        onChange={(e) => setSort(e.target.value as any)}
-                                        className="bg-transparent text-sm font-medium text-zinc-900 outline-none"
-                                    >
-                                        {SORTS.map((s) => (
-                                            <option key={s.key} value={s.key}>
-                                                {s.label}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-
-                                <Button variant="ghost" className="rounded-xl" onClick={clearAll}>
-                                    <X className="mr-2 h-4 w-4" />
-                                    Reset
-                                </Button>
                             </div>
                         </div>
                     </div>
@@ -535,7 +491,7 @@ export default function ShopPage() {
                                 </p>
                             </div>
 
-                            <div className="mt-6 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                            <div className="mt-6 grid gap-5 gap-y-10 md:gap-y-14 sm:grid-cols-2 xl:grid-cols-3">
                                 {filtered.map((p) => (
                                     <ProductCard key={p.id} p={p} />
                                 ))}

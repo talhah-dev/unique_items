@@ -4,32 +4,21 @@ import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 import UserWrapper from "@/app/(wrappers)/userWrapper";
 
-type Collection = {
-    title: string;
-    image: string;
-    href: string;
-};
-
-const collections: Collection[] = [
+const categories = [
     {
-        title: "Classic Collection",
-        image: "/images/collections/classic.jpg",
-        href: "/collections/classic",
+        title: "Men Watches",
+        image: "https://images.unsplash.com/photo-1622434641406-a158123450f9?q=80&w=704&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        href: "/category/men",
     },
     {
-        title: "Minimal Collection",
-        image: "/images/collections/minimal.jpg",
-        href: "/collections/minimal",
+        title: "Women Watches",
+        image: "https://images.unsplash.com/photo-1736615494527-a0f4a70f1101?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDIzfHx8ZW58MHx8fHx8",
+        href: "/category/women",
     },
     {
-        title: "Sport Collection",
-        image: "/images/collections/sport.jpg",
-        href: "/collections/sport",
-    },
-    {
-        title: "Premium Collection",
-        image: "/images/collections/premium.jpg",
-        href: "/collections/premium",
+        title: "Sport Watches",
+        image: "https://images.unsplash.com/photo-1691439378545-dd6b35ff2f7b?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        href: "/category/sport",
     },
 ];
 
@@ -50,33 +39,34 @@ export default function CollectionsPage() {
 
                 <section className="py-12 sm:py-16">
                     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                            {collections.map((c) => (
+                        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                            {categories.map((cat) => (
                                 <Link
-                                    key={c.title}
-                                    href={c.href}
-                                    className="group overflow-hidden rounded-3xl border bg-white transition hover:shadow-lg"
+                                    key={cat.title}
+                                    href={cat.href}
+                                    className="group overflow-hidden transition"
                                 >
-                                    <div className="relative h-60 w-full">
+                                    <div className="relative h-56 rounded-lg overflow-hidden md:h-96 w-full">
                                         <Image
-                                            src={c.image}
-                                            alt={c.title}
+                                            src={cat.image}
+                                            alt={cat.title}
                                             fill
-                                            className="object-cover transition-transform duration-500 group-hover:scale-105"
+                                            className="object-cover rounded-lg  transition-transform duration-500 group-hover:scale-105"
                                         />
                                     </div>
 
-                                    <div className="p-5">
+                                    <div className="md:py-7 py-4">
                                         <div className="flex items-center justify-between gap-3">
                                             <h3 className="text-base font-semibold text-zinc-900">
-                                                {c.title}
+                                                {cat.title}
                                             </h3>
+
                                             <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border text-zinc-900 transition group-hover:bg-zinc-900 group-hover:text-white">
                                                 <ArrowUpRight className="h-4 w-4" />
                                             </span>
                                         </div>
 
-                                        <div className="mt-4 h-[2px] w-full overflow-hidden rounded-full bg-zinc-200">
+                                        <div className="mt-4 h-[2px] w-full bg-zinc-200 overflow-hidden rounded-full">
                                             <div className="h-full w-0 bg-zinc-900 transition-all duration-500 group-hover:w-full" />
                                         </div>
                                     </div>

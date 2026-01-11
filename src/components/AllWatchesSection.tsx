@@ -22,7 +22,7 @@ const products: Product[] = [
     {
         id: "p1",
         title: "Patek philip silver with black dial with day&date",
-        image: "/images/products/p1.jpg",
+        image: "/images/hero/hero-bg-2.png",
         href: "/products/p1",
         discountPercent: 9,
         soldOut: true,
@@ -33,7 +33,7 @@ const products: Product[] = [
     {
         id: "p2",
         title: "Patek philip silver with white dial",
-        image: "/images/products/p2.jpg",
+        image: "/images/hero/hero-bg-2.png",
         href: "/products/p2",
         discountPercent: 9,
         soldOut: true,
@@ -44,7 +44,7 @@ const products: Product[] = [
     {
         id: "p3",
         title: "Patek philip silver with tifny dial",
-        image: "/images/products/p3.jpg",
+        image: "/images/hero/hero-bg-2.png",
         href: "/products/p3",
         discountPercent: 9,
         oldPrice: 4250,
@@ -55,7 +55,7 @@ const products: Product[] = [
     {
         id: "p4",
         title: "Patek philip black with black dial with date",
-        image: "/images/products/p4.jpg",
+        image: "/images/hero/hero-bg-2.png",
         href: "/products/p4",
         discountPercent: 9,
         oldPrice: 4250,
@@ -65,7 +65,7 @@ const products: Product[] = [
     {
         id: "p1",
         title: "Patek philip silver with black dial with day&date",
-        image: "/images/products/p1.jpg",
+        image: "/images/hero/hero-bg-2.png",
         href: "/products/p1",
         discountPercent: 9,
         soldOut: true,
@@ -76,7 +76,7 @@ const products: Product[] = [
     {
         id: "p2",
         title: "Patek philip silver with white dial",
-        image: "/images/products/p2.jpg",
+        image: "/images/hero/hero-bg-2.png",
         href: "/products/p2",
         discountPercent: 9,
         soldOut: true,
@@ -87,7 +87,7 @@ const products: Product[] = [
     {
         id: "p3",
         title: "Patek philip silver with tifny dial",
-        image: "/images/products/p3.jpg",
+        image: "/images/hero/hero-bg-2.png",
         href: "/products/p3",
         discountPercent: 9,
         oldPrice: 4250,
@@ -98,7 +98,7 @@ const products: Product[] = [
     {
         id: "p4",
         title: "Patek philip black with black dial with date",
-        image: "/images/products/p4.jpg",
+        image: "/images/hero/hero-bg-2.png",
         href: "/products/p4",
         discountPercent: 9,
         oldPrice: 4250,

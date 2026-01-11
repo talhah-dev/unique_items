@@ -71,8 +71,8 @@ export default function ContactPage() {
 
                 <section className="py-16">
                     <div className="mx-auto w-full max-w-7xl px-6">
-                        <div className="flex flex-col gap-12 lg:flex-row lg:items-start lg:gap-16">
-                            <div className="grid w-full grid-cols-1 gap-1 border bg-muted p-1 sm:grid-cols-2 lg:max-w-3xl">
+                        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-6">
+                            <div className="grid w-full grid-cols-1 gap-1 border bg-muted p-1 sm:grid-cols-2 lg:max-w-2xl">
                                 <div className="bg-background border p-6">
                                     <div className="flex h-12 w-12 items-center justify-center rounded-xl border bg-foreground/5 text-foreground dark:bg-foreground/10">
                                         <MailIcon className="h-5 w-5" />
@@ -134,7 +134,7 @@ export default function ContactPage() {
                                 </div>
                             </div>
 
-                            <div className="w-full max-w-lg border bg-muted p-1 lg:ml-auto">
+                            <div className="w-full border bg-muted p-1 lg:ml-auto">
                                 <Card className="rounded-none bg-white/60 shadow-none">
                                     <CardHeader>
                                         <CardTitle>Send us a message</CardTitle>
@@ -148,14 +148,14 @@ export default function ContactPage() {
                             </div>
                         </div>
 
-                        <div className="mt-14 overflow-hidden rounded-3xl border bg-zinc-50">
+                        <div className="mt-14 overflow-hidden rounded-lg border bg-zinc-50">
                             <div className="px-6 py-5">
-                                <p className="text-sm font-medium text-zinc-900">Find us on map</p>
+                                <p className="text-lg mb-1 font-medium text-zinc-900">Find us on map</p>
                                 <p className="text-sm text-zinc-600">
-                                    Replace the location with your exact shop/office address.
+                                    Karachi, Pakistan.
                                 </p>
                             </div>
-                            <div className="h-[380px] w-full">
+                            <div className="h-[380px] md:h-[35rem] w-full">
                                 <iframe
                                     title="Unique Items Location"
                                     className="h-full w-full"
