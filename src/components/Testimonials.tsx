@@ -4,9 +4,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 export default function Testimonials() {
     return (
         <section className="py-16 md:py-32">
-            <div className="mx-auto max-w-6xl space-y-8 px-6 md:space-y-16">
-                <div className="relative z-10 mx-auto max-w-xl space-y-6 text-center md:space-y-12">
-                    <h2 className="text-4xl font-medium lg:text-5xl">
+            <div className="mx-auto max-w-7xl space-y-8 px-6 md:space-y-16">
+                <div className="relative z-10 mx-auto max-w-xl space-y-6 text-center ">
+                    <h2 className="text-3xl font-medium max-w-sm capitalize leading-tight mx-auto lg:text-4xl">
                         Loved by customers across Pakistan
                     </h2>
                     <p className="text-muted-foreground">

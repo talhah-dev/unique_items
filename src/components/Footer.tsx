@@ -1,29 +1,27 @@
 import Link from "next/link";
-import { Watch, Facebook, Instagram, Twitter, Mail, Phone } from "lucide-react";
+import { Watch, Facebook, Instagram, Twitter, Mail, Phone, LucideTwitter } from "lucide-react";
+import Image from "next/image";
 
 export default function Footer() {
     return (
         <footer className="border-t bg-zinc-950 text-zinc-200">
-            <div className="mx-auto max-w-7xl px-6 py-16">
+            <div className="mx-auto max-w-7xl px-6 pt-16 pb-8 md:pt-24">
                 <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
                     <div className="space-y-4">
-                        <div className="flex items-center gap-3">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-zinc-900">
-                                <Watch className="h-5 w-5" />
-                            </div>
-                            <span className="text-lg font-semibold">Unique Items</span>
-                        </div>
-                        <p className="text-sm text-zinc-400">
+                        <Link href={"/"} className="block">
+                            <Image src={"/logo1.png"} alt="Unique Items" width={200} height={200} className="invert h-24 w-auto" />
+                        </Link>
+                        <p className="text-zinc-300">
                             Unique Items is your trusted online store for premium, stylish,
                             and affordable watches for men, women, and kids.
                         </p>
                     </div>
 
                     <div>
-                        <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide">
+                        <h3 className="mb-4 text-xl font-semibold uppercase tracking-wide">
                             Shop
                         </h3>
-                        <ul className="space-y-2 text-sm text-zinc-400">
+                        <ul className="space-y-3 text-zinc-300">
                             <li>
                                 <Link href="/shop" className="hover:text-white">
                                     All Watches
@@ -48,10 +46,10 @@ export default function Footer() {
                     </div>
 
                     <div>
-                        <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide">
+                        <h3 className="mb-4 text-xl font-semibold uppercase tracking-wide">
                             Company
                         </h3>
-                        <ul className="space-y-2 text-sm text-zinc-400">
+                        <ul className="space-y-3 text-zinc-300">
                             <li>
                                 <Link href="/about" className="hover:text-white">
                                     About Us
@@ -76,10 +74,10 @@ export default function Footer() {
                     </div>
 
                     <div>
-                        <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide">
+                        <h3 className="mb-4 text-xl font-semibold uppercase tracking-wide">
                             Contact
                         </h3>
-                        <ul className="space-y-3 text-sm text-zinc-400">
+                        <ul className="space-y-4 text-zinc-300">
                             <li className="flex items-center gap-2">
                                 <Mail className="h-4 w-4" />
                                 support@uniqueitems.pk
@@ -91,30 +89,30 @@ export default function Footer() {
                             <li className="flex gap-3 pt-2">
                                 <Link
                                     href="#"
-                                    className="rounded-full bg-zinc-800 p-2 hover:bg-white hover:text-zinc-900"
+                                    className="rounded-full transition-all bg-zinc-800 p-4 hover:bg-white hover:text-zinc-900"
                                 >
-                                    <Facebook className="h-4 w-4" />
+                                    <Facebook className="h-5 w-5" />
                                 </Link>
                                 <Link
                                     href="#"
-                                    className="rounded-full bg-zinc-800 p-2 hover:bg-white hover:text-zinc-900"
+                                    className="rounded-full transition-all bg-zinc-800 p-4 hover:bg-white hover:text-zinc-900"
                                 >
-                                    <Instagram className="h-4 w-4" />
+                                    <Instagram className="h-5 w-5" />
                                 </Link>
                                 <Link
                                     href="#"
-                                    className="rounded-full bg-zinc-800 p-2 hover:bg-white hover:text-zinc-900"
+                                    className="rounded-full transition-all bg-zinc-800 p-4 hover:bg-white hover:text-zinc-900"
                                 >
-                                    <Twitter className="h-4 w-4" />
+                                    <LucideTwitter className="h-5 w-5" />
                                 </Link>
                             </li>
                         </ul>
                     </div>
                 </div>
 
-                <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-zinc-800 pt-6 text-sm text-zinc-500 md:flex-row">
+                <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-zinc-800 pt-6 text-sm text-zinc-400 md:flex-row">
                     <p>© {new Date().getFullYear()} Unique Items. All rights reserved.</p>
-                    <p>Designed for premium watch lovers</p>
+                    <p className="md:block hidden">Designed for premium watch lovers</p>
                 </div>
             </div>
         </footer>

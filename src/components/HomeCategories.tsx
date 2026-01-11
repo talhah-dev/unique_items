@@ -4,21 +4,33 @@ import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 import { Badge } from "./ui/badge";
 
+// const categories = [
+//     {
+//         title: "Men Watches",
+//         image: "/images/categories/men.jpg",
+//         href: "/category/men",
+//     },
+//     {
+//         title: "Women Watches",
+//         image: "/images/categories/women.jpg",
+//         href: "/category/women",
+//     },
+//     {
+//         title: "Sport Watches",
+//         image: "/images/hero/hero-bg-3.png",
+//         href: "/category/sport",
+//     },
+// ];
 const categories = [
     {
         title: "Men Watches",
-        image: "/images/categories/men.jpg",
+        image: "/images/hero/hero-bg-1.png",
         href: "/category/men",
     },
     {
         title: "Women Watches",
-        image: "/images/categories/women.jpg",
+        image: "/images/hero/hero-bg-2.png",
         href: "/category/women",
-    },
-    {
-        title: "Kids Watches",
-        image: "/images/categories/kids.jpg",
-        href: "/category/kids",
     },
     {
         title: "Sport Watches",
@@ -29,9 +41,9 @@ const categories = [
 
 export default function HomeCategories() {
     return (
-        <section className="w-full bg-white">
+        <section className="w-full md:pt-10">
             <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
-                <div className="mb-10 space-y-3 text-center">
+                <div className="mb-10 md:mb-14 space-y-4 text-center">
                     <Badge variant="secondary" className="rounded-full px-4 py-1">
                         Categories
                     </Badge>
@@ -59,7 +71,7 @@ export default function HomeCategories() {
                                 />
                             </div>
 
-                            <div className="py-7">
+                            <div className="md:py-7 py-4">
                                 <div className="flex items-center justify-between gap-3">
                                     <h3 className="text-base font-semibold text-zinc-900">
                                         {cat.title}

@@ -62,6 +62,49 @@ const products: Product[] = [
         price: 3850,
         cta: "ADD_TO_CART",
     },
+    {
+        id: "p1",
+        title: "Patek philip silver with black dial with day&date",
+        image: "/images/products/p1.jpg",
+        href: "/products/p1",
+        discountPercent: 9,
+        soldOut: true,
+        oldPrice: 4250,
+        price: 3850,
+        cta: "READ_MORE",
+    },
+    {
+        id: "p2",
+        title: "Patek philip silver with white dial",
+        image: "/images/products/p2.jpg",
+        href: "/products/p2",
+        discountPercent: 9,
+        soldOut: true,
+        oldPrice: 4250,
+        price: 3850,
+        cta: "READ_MORE",
+    },
+    {
+        id: "p3",
+        title: "Patek philip silver with tifny dial",
+        image: "/images/products/p3.jpg",
+        href: "/products/p3",
+        discountPercent: 9,
+        oldPrice: 4250,
+        price: 3850,
+        showActions: true,
+        cta: "ADD_TO_CART",
+    },
+    {
+        id: "p4",
+        title: "Patek philip black with black dial with date",
+        image: "/images/products/p4.jpg",
+        href: "/products/p4",
+        discountPercent: 9,
+        oldPrice: 4250,
+        price: 3850,
+        cta: "ADD_TO_CART",
+    },
 ];
 
 function formatPKR(value: number) {
@@ -70,8 +113,8 @@ function formatPKR(value: number) {
 
 export default function AllWatchesSection() {
     return (
-        <section className="w-full bg-white">
-            <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
+        <section className="w-full ">
+            <div className="mx-auto max-w-7xl px-4 pt-8 lg:pt-10">
                 <div className="flex items-end justify-between gap-4">
                     <div>
                         <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl">
@@ -82,16 +125,16 @@ export default function AllWatchesSection() {
                         </p>
                     </div>
 
-                    <Button asChild className="hidden rounded-full px-5 sm:inline-flex">
+                    <Button className="hidden rounded-full px-5 sm:inline-flex">
                         <Link href="/shop" className="inline-flex items-center gap-2">
                             View All <ArrowRight className="h-4 w-4" />
                         </Link>
                     </Button>
                 </div>
 
-                <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                    {products.map((p) => (
-                        <div key={p.id} className="group">
+                <div className="mt-10 grid gap-5 sm:grid-cols-2 md:gap-y-20 gap-y-10 lg:grid-cols-4">
+                    {products.map((p, idx) => (
+                        <div key={idx} className="group">
                             <div className="relative overflow-hidden rounded-2xl bg-zinc-50">
                                 <Link href={p.href} className="block">
                                     <div className="relative aspect-[4/5] w-full">
@@ -147,7 +190,7 @@ export default function AllWatchesSection() {
                             <div className="mt-4">
                                 <Link
                                     href={p.href}
-                                    className="line-clamp-2 text-sm font-medium text-zinc-900 hover:underline"
+                                    className="line-clamp-1 text-sm font-medium text-zinc-900 hover:underline"
                                 >
                                     {p.title}
                                 </Link>

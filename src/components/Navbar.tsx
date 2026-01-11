@@ -3,11 +3,12 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, Search, ShoppingBag, User, Watch } from "lucide-react";
+import { Menu, X, Search, ShoppingBag, User, Watch, ArrowBigRight, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 const navLinks = [
     { name: "Home", href: "/" },
@@ -23,17 +24,9 @@ export default function Navbar() {
 
     return (
         <header className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60">
-            <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
+            <div className="mx-auto flex h-20 md:h-22 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
                 <Link href="/" className="flex items-center gap-2">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-zinc-900 text-white shadow-sm">
-                        <Watch className="h-5 w-5" />
-                    </span>
-                    <div className="leading-tight">
-                        <p className="text-sm font-semibold tracking-tight text-zinc-900">
-                            Unique Items
-                        </p>
-                        <p className="text-[11px] text-zinc-500">Watches Store</p>
-                    </div>
+                    <Image src={"/logo1.png"} alt="Unique Items logo" width={150} height={150} className="md:h-20 h-16 w-auto" />
                 </Link>
 
                 <nav className="hidden items-center gap-1 md:flex">
@@ -61,7 +54,7 @@ export default function Navbar() {
                         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
                         <Input
                             placeholder="Search watches..."
-                            className="h-10 rounded-xl pl-9"
+                            className="h-10 rounded-lg pl-9"
                         />
                     </div>
 
@@ -79,17 +72,14 @@ export default function Navbar() {
                 </div>
 
                 <div className="flex items-center gap-2 md:hidden">
-                    <Button variant="ghost" size="icon" className="rounded-xl">
-                        <Search className="h-5 w-5" />
-                    </Button>
 
-                    <Button variant="ghost" size="icon" className="rounded-xl">
+                    <Button variant="ghost" size="icon" className="rounded-lg bg-zinc-100">
                         <ShoppingBag className="h-5 w-5" />
                     </Button>
 
                     <Sheet open={open} onOpenChange={setOpen}>
                         <SheetTrigger asChild>
-                            <Button variant="outline" size="icon" className="rounded-xl">
+                            <Button variant="outline" size="icon" className="rounded-lg">
                                 <Menu className="h-5 w-5" />
                             </Button>
                         </SheetTrigger>
@@ -101,7 +91,7 @@ export default function Navbar() {
                                 <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="rounded-xl"
+                                    className="bg-zinc-200 relative z-10 rounded-xl"
                                     onClick={() => setOpen(false)}
                                 >
                                     <X className="h-5 w-5" />
@@ -109,13 +99,6 @@ export default function Navbar() {
                             </div>
 
                             <div className="p-4">
-                                <div className="relative">
-                                    <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
-                                    <Input
-                                        placeholder="Search watches..."
-                                        className="h-11 rounded-xl pl-9"
-                                    />
-                                </div>
 
                                 <div className="mt-4 grid gap-2">
                                     {navLinks.map((item) => {
@@ -126,20 +109,20 @@ export default function Navbar() {
                                                 href={item.href}
                                                 onClick={() => setOpen(false)}
                                                 className={cn(
-                                                    "flex items-center justify-between rounded-2xl border px-4 py-3 text-sm font-medium transition-colors",
+                                                    "flex items-center justify-between rounded-lg border px-4 py-3 text-sm font-medium transition-colors",
                                                     active
                                                         ? "border-zinc-900 bg-zinc-900 text-white"
                                                         : "border-zinc-200 bg-white hover:bg-zinc-50"
                                                 )}
                                             >
                                                 {item.name}
-                                                <span className="text-xs opacity-70">→</span>
+                                                <span className="text-xs opacity-70"><ArrowRight className="h-4 w-4" /></span>
                                             </Link>
                                         );
                                     })}
                                 </div>
 
-                                <div className="mt-6 grid gap-2">
+                                {/* <div className="mt-6 grid gap-2">
                                     <Button asChild className="h-11 rounded-xl">
                                         <Link href="/shop" onClick={() => setOpen(false)}>
                                             Shop Watches
@@ -152,7 +135,7 @@ export default function Navbar() {
                                     >
                                         Sign In
                                     </Button>
-                                </div>
+                                </div> */}
                             </div>
                         </SheetContent>
                     </Sheet>

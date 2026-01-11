@@ -85,7 +85,7 @@ export default function HeroSlider() {
                 <CarouselContent>
                     {slides.map((s) => (
                         <CarouselItem key={s.id} className="p-0">
-                            <div className="relative min-h-[100vh] w-full overflow-hidden">
+                            <div className="relative px-4 min-h-[100vh] w-full overflow-hidden">
                                 <div className="absolute inset-0 -z-10">
                                     <Image
                                         src={s.bg}
@@ -127,7 +127,7 @@ export default function HeroSlider() {
                                                 </Button>
                                             </div>
 
-                                            <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                                            <div className="mt-6 md:grid hidden gap-3 sm:grid-cols-3">
                                                 <div className="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur">
                                                     <p className="text-xs text-white/70">Fast Delivery</p>
                                                     <p className="text-sm font-medium text-white">
@@ -151,7 +151,7 @@ export default function HeroSlider() {
 
                                         <div className="relative mx-auto w-full max-w-[520px]">
                                             <div className="absolute -inset-6 rounded-[32px] bg-white/10 blur-2xl" />
-                                            <div className="relative overflow-hidden rounded-[32px] border border-white/15 bg-white/10 p-6 backdrop-blur sm:p-8">
+                                            <div className="relative overflow-hidden rounded-xl border border-white/15 bg-white/10 p-6 backdrop-blur sm:p-8">
                                                 <div className="relative mx-auto aspect-square w-full max-w-[420px]">
                                                     <Image
                                                         src={s.image}

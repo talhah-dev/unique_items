@@ -13,6 +13,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { ArrowUpRight, Filter, Search, X } from "lucide-react";
+import UserWrapper from "@/app/(wrappers)/userWrapper";
 
 type Category = "all" | "men" | "women" | "kids" | "sport";
 type Strap = "leather" | "steel" | "silicone";
@@ -434,125 +435,127 @@ export default function ShopPage() {
     }, [category, query, price, strap, availability, sort]);
 
     return (
-        <div className="min-h-screen bg-white">
-            <section className="border-b bg-zinc-50">
-                <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                        <div>
-                            <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl">
-                                Shop
-                            </h1>
-                            <p className="mt-2 text-sm text-zinc-600 sm:text-base">
-                                Explore all watches and filter by category, strap, and price.
-                            </p>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                            <Sheet>
-                                <SheetTrigger asChild>
-                                    <Button variant="outline" className="rounded-xl lg:hidden">
-                                        <Filter className="mr-2 h-4 w-4" />
-                                        Filters
-                                    </Button>
-                                </SheetTrigger>
-                                <SheetContent side="left" className="w-[340px]">
-                                    <SheetHeader>
-                                        <SheetTitle>Filters</SheetTitle>
-                                    </SheetHeader>
-                                    <div className="mt-6">
-                                        <SidebarFilters
-                                            category={category}
-                                            setCategory={setCategory}
-                                            query={query}
-                                            setQuery={setQuery}
-                                            price={price}
-                                            setPrice={setPrice}
-                                            strap={strap}
-                                            setStrap={setStrap}
-                                            availability={availability}
-                                            setAvailability={setAvailability}
-                                            minPrice={min}
-                                            maxPrice={max}
-                                            clearAll={clearAll}
-                                        />
-                                    </div>
-                                </SheetContent>
-                            </Sheet>
-
-                            <div className="flex items-center gap-2 rounded-xl border bg-white px-3 py-2">
-                                <span className="text-sm text-zinc-600">Sort:</span>
-                                <select
-                                    value={sort}
-                                    onChange={(e) => setSort(e.target.value as any)}
-                                    className="bg-transparent text-sm font-medium text-zinc-900 outline-none"
-                                >
-                                    {SORTS.map((s) => (
-                                        <option key={s.key} value={s.key}>
-                                            {s.label}
-                                        </option>
-                                    ))}
-                                </select>
+        <UserWrapper>
+            <div className="min-h-screen bg-white">
+                <section className="border-b bg-zinc-50">
+                    <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+                        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                            <div>
+                                <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl">
+                                    Shop
+                                </h1>
+                                <p className="mt-2 text-sm text-zinc-600 sm:text-base">
+                                    Explore all watches and filter by category, strap, and price.
+                                </p>
                             </div>
 
-                            <Button variant="ghost" className="rounded-xl" onClick={clearAll}>
-                                <X className="mr-2 h-4 w-4" />
-                                Reset
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-            </section>
+                            <div className="flex items-center gap-2">
+                                <Sheet>
+                                    <SheetTrigger asChild>
+                                        <Button variant="outline" className="rounded-xl lg:hidden">
+                                            <Filter className="mr-2 h-4 w-4" />
+                                            Filters
+                                        </Button>
+                                    </SheetTrigger>
+                                    <SheetContent side="left" className="w-[340px]">
+                                        <SheetHeader>
+                                            <SheetTitle>Filters</SheetTitle>
+                                        </SheetHeader>
+                                        <div className="mt-6">
+                                            <SidebarFilters
+                                                category={category}
+                                                setCategory={setCategory}
+                                                query={query}
+                                                setQuery={setQuery}
+                                                price={price}
+                                                setPrice={setPrice}
+                                                strap={strap}
+                                                setStrap={setStrap}
+                                                availability={availability}
+                                                setAvailability={setAvailability}
+                                                minPrice={min}
+                                                maxPrice={max}
+                                                clearAll={clearAll}
+                                            />
+                                        </div>
+                                    </SheetContent>
+                                </Sheet>
 
-            <section>
-                <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[300px_1fr] lg:px-8">
-                    <aside className="hidden lg:block">
-                        <div className="sticky top-24 rounded-3xl border bg-zinc-50 p-5">
-                            <SidebarFilters
-                                category={category}
-                                setCategory={setCategory}
-                                query={query}
-                                setQuery={setQuery}
-                                price={price}
-                                setPrice={setPrice}
-                                strap={strap}
-                                setStrap={setStrap}
-                                availability={availability}
-                                setAvailability={setAvailability}
-                                minPrice={min}
-                                maxPrice={max}
-                                clearAll={clearAll}
-                            />
-                        </div>
-                    </aside>
+                                <div className="flex items-center gap-2 rounded-xl border bg-white px-3 py-2">
+                                    <span className="text-sm text-zinc-600">Sort:</span>
+                                    <select
+                                        value={sort}
+                                        onChange={(e) => setSort(e.target.value as any)}
+                                        className="bg-transparent text-sm font-medium text-zinc-900 outline-none"
+                                    >
+                                        {SORTS.map((s) => (
+                                            <option key={s.key} value={s.key}>
+                                                {s.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
 
-                    <div>
-                        <div className="flex items-center justify-between gap-3">
-                            <p className="text-sm text-zinc-600">
-                                Showing <span className="font-semibold text-zinc-900">{filtered.length}</span>{" "}
-                                results
-                            </p>
-                        </div>
-
-                        <div className="mt-6 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                            {filtered.map((p) => (
-                                <ProductCard key={p.id} p={p} />
-                            ))}
-                        </div>
-
-                        {filtered.length === 0 && (
-                            <div className="mt-10 rounded-3xl border bg-zinc-50 p-10 text-center">
-                                <p className="text-lg font-semibold text-zinc-900">No products found</p>
-                                <p className="mt-2 text-sm text-zinc-600">
-                                    Try changing filters or reset to see all products.
-                                </p>
-                                <Button className="mt-5 rounded-xl" onClick={clearAll}>
-                                    Reset Filters
+                                <Button variant="ghost" className="rounded-xl" onClick={clearAll}>
+                                    <X className="mr-2 h-4 w-4" />
+                                    Reset
                                 </Button>
                             </div>
-                        )}
+                        </div>
                     </div>
-                </div>
-            </section>
-        </div>
+                </section>
+
+                <section>
+                    <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[300px_1fr] lg:px-8">
+                        <aside className="hidden lg:block">
+                            <div className="sticky top-24 rounded-3xl border bg-zinc-50 p-5">
+                                <SidebarFilters
+                                    category={category}
+                                    setCategory={setCategory}
+                                    query={query}
+                                    setQuery={setQuery}
+                                    price={price}
+                                    setPrice={setPrice}
+                                    strap={strap}
+                                    setStrap={setStrap}
+                                    availability={availability}
+                                    setAvailability={setAvailability}
+                                    minPrice={min}
+                                    maxPrice={max}
+                                    clearAll={clearAll}
+                                />
+                            </div>
+                        </aside>
+
+                        <div>
+                            <div className="flex items-center justify-between gap-3">
+                                <p className="text-sm text-zinc-600">
+                                    Showing <span className="font-semibold text-zinc-900">{filtered.length}</span>{" "}
+                                    results
+                                </p>
+                            </div>
+
+                            <div className="mt-6 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                                {filtered.map((p) => (
+                                    <ProductCard key={p.id} p={p} />
+                                ))}
+                            </div>
+
+                            {filtered.length === 0 && (
+                                <div className="mt-10 rounded-3xl border bg-zinc-50 p-10 text-center">
+                                    <p className="text-lg font-semibold text-zinc-900">No products found</p>
+                                    <p className="mt-2 text-sm text-zinc-600">
+                                        Try changing filters or reset to see all products.
+                                    </p>
+                                    <Button className="mt-5 rounded-xl" onClick={clearAll}>
+                                        Reset Filters
+                                    </Button>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </UserWrapper>
     );
 }
