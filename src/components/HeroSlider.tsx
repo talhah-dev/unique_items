@@ -181,8 +181,8 @@ export default function HeroSlider() {
                     ))}
                 </CarouselContent>
 
-                <CarouselPrevious className="left-4 top-1/2 md:block hidden -translate-y-1/2 border-white/20 bg-white/10 text-white hover:bg-white/15" />
-                <CarouselNext className="right-4 top-1/2 md:block hidden -translate-y-1/2 border-white/20 bg-white/10 text-white hover:bg-white/15" />
+                <CarouselPrevious className="left-4 top-1/2 md:inline-flex hidden -translate-y-1/2 border-white/20 bg-white/10 text-white hover:bg-white/15" />
+                <CarouselNext className="right-4 top-1/2 md:inline-flex hidden -translate-y-1/2 border-white/20 bg-white/10 text-white hover:bg-white/15" />
             </Carousel>
         </section>
     );
