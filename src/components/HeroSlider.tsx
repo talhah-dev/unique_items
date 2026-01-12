@@ -149,7 +149,7 @@ export default function HeroSlider() {
                                             </div>
                                         </div>
 
-                                        <div className="relative mx-auto w-full max-w-[520px]">
+                                        <div className="relative md:block hidden mx-auto w-full max-w-[520px]">
                                             <div className="absolute -inset-6 rounded-[32px] bg-white/10 blur-2xl" />
                                             <div className="relative overflow-hidden rounded-xl border border-white/15 bg-white/10 p-5 backdrop-blur px-6">
                                                 <div className="relative mx-auto aspect-square w-full w-full">
@@ -181,8 +181,8 @@ export default function HeroSlider() {
                     ))}
                 </CarouselContent>
 
-                <CarouselPrevious className="left-4 top-1/2 -translate-y-1/2 border-white/20 bg-white/10 text-white hover:bg-white/15" />
-                <CarouselNext className="right-4 top-1/2 -translate-y-1/2 border-white/20 bg-white/10 text-white hover:bg-white/15" />
+                <CarouselPrevious className="left-4 top-1/2 md:block hidden -translate-y-1/2 border-white/20 bg-white/10 text-white hover:bg-white/15" />
+                <CarouselNext className="right-4 top-1/2 md:block hidden -translate-y-1/2 border-white/20 bg-white/10 text-white hover:bg-white/15" />
             </Carousel>
         </section>
     );

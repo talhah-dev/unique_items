@@ -93,11 +93,13 @@ export default function CartPage() {
                                     <span>₨ 9,998</span>
                                 </div>
 
-                                <Button className="w-full h-11 rounded-xl">
-                                    Proceed to Checkout
-                                </Button>
+                                <Link href="/checkout">
+                                    <Button className="w-full h-11 rounded-xl">
+                                        Proceed to Checkout
+                                    </Button>
+                                </Link>
 
-                                <p className="text-center text-xs text-zinc-500">
+                                <p className="text-center mt-4 text-xs text-zinc-500">
                                     Secure checkout • COD available
                                 </p>
                             </CardContent>

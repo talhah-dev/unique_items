@@ -189,7 +189,9 @@ export default function CheckoutPage() {
                                         <span className="text-lg font-semibold text-zinc-900">₨ 9,998</span>
                                     </div>
 
-                                    <Button className="h-11 w-full rounded-xl">Place Order</Button>
+                                    <Link href="/order-success">
+                                        <Button className="h-11 w-full rounded-xl">Place Order</Button>
+                                    </Link>
 
                                     <Button asChild variant="outline" className="h-11 w-full rounded-xl">
                                         <Link href="/cart">Back to Cart</Link>
