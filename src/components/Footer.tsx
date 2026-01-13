@@ -109,6 +109,12 @@ export default function Footer() {
                                     >
                                         <LucideTwitter className="h-5 w-5" />
                                     </Link>
+                                    <Link
+                                        href="#"
+                                        className="rounded-full transition-all bg-zinc-800 p-4 hover:bg-white hover:text-zinc-900"
+                                    >
+                                        <LucideTwitter className="h-5 w-5" />
+                                    </Link>
                                 </li>
                             </ul>
                         </div>

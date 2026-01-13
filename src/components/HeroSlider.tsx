@@ -29,7 +29,7 @@ const slides: Slide[] = [
     {
         id: "s1",
         bg: "/images/hero/hero-bg-1.png",
-        title: "Unique Items Watches",
+        title: "Premium Watches",
         subtitle: "Timeless Style. Everyday Confidence.",
         desc: "Explore premium watches designed for comfort, durability, and a clean modern look.",
         image: "https://images.unsplash.com/photo-1524805444758-089113d48a6d?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8d2F0Y2hzfGVufDB8fDB8fHww",

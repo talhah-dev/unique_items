@@ -1,19 +1,14 @@
 "use client";
 
-import React from "react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import {
     Card,
-    CardContent,
     CardDescription,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { FaWhatsapp } from "react-icons/fa";
+
 import {
     MailIcon,
     MapPinIcon,
@@ -73,7 +68,7 @@ export default function ContactPage() {
                     <div className="mx-auto w-full max-w-7xl px-6">
                         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-6">
                             <div className="grid w-full grid-cols-1 gap-1 border bg-muted p-1 sm:grid-cols-2 lg:max-w-2xl">
-                                <div className="bg-background border p-6">
+                                <div className="group bg-background border p-6 transition hover:shadow-md">
                                     <div className="flex h-12 w-12 items-center justify-center rounded-xl border bg-foreground/5 text-foreground dark:bg-foreground/10">
                                         <MailIcon className="h-5 w-5" />
                                     </div>
@@ -81,29 +76,43 @@ export default function ContactPage() {
                                     <p className="my-2.5 text-muted-foreground">
                                         For orders, returns, and general questions.
                                     </p>
-                                    <Link className="font-medium text-primary" href="mailto:support@uniqueitems.pk">
+                                    <Link
+                                        className="font-medium text-primary underline-offset-4 hover:underline"
+                                        href="mailto:support@uniqueitems.pk"
+                                    >
                                         support@uniqueitems.pk
                                     </Link>
                                 </div>
 
-                                <div className="bg-background border p-6">
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-xl border bg-foreground/5 text-foreground dark:bg-foreground/10">
-                                        <MessageCircle className="h-5 w-5" />
+                                <div className="group bg-background border p-6 transition hover:shadow-md">
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-xl border bg-green-500/10 text-green-600">
+                                        <FaWhatsapp className="h-5 w-5" />
                                     </div>
                                     <h3 className="mt-6 text-xl font-semibold">WhatsApp / Chat</h3>
                                     <p className="my-2.5 text-muted-foreground">
                                         Quick help for size, availability, and order updates.
                                     </p>
-                                    <Link
-                                        className="font-medium text-primary"
-                                        href="https://wa.me/923001234567"
-                                        target="_blank"
-                                    >
-                                        Start chat on WhatsApp
-                                    </Link>
+                                    <div className="flex flex-col gap-2">
+                                        <Link
+                                            className="inline-flex items-center gap-2 rounded-lg bg-green-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-600"
+                                            href="https://wa.me/923191994293"
+                                            target="_blank"
+                                        >
+                                            <FaWhatsapp className="h-4 w-4" />
+                                            0319 1994293
+                                        </Link>
+                                        <Link
+                                            className="inline-flex items-center gap-2 rounded-lg bg-green-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-600"
+                                            href="https://wa.me/923390134186"
+                                            target="_blank"
+                                        >
+                                            <FaWhatsapp className="h-4 w-4" />
+                                            0339 0134186
+                                        </Link>
+                                    </div>
                                 </div>
 
-                                <div className="bg-background border p-6">
+                                <div className="group bg-background border p-6 transition hover:shadow-md">
                                     <div className="flex h-12 w-12 items-center justify-center rounded-xl border bg-foreground/5 text-foreground dark:bg-foreground/10">
                                         <MapPinIcon className="h-5 w-5" />
                                     </div>
@@ -112,7 +121,7 @@ export default function ContactPage() {
                                         Visit us for product queries and support.
                                     </p>
                                     <Link
-                                        className="font-medium text-primary"
+                                        className="font-medium text-primary underline-offset-4 hover:underline"
                                         href="https://www.google.com/maps?q=Karachi"
                                         target="_blank"
                                     >
@@ -120,19 +129,33 @@ export default function ContactPage() {
                                     </Link>
                                 </div>
 
-                                <div className="bg-background border p-6">
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-xl border bg-foreground/5 text-foreground dark:bg-foreground/10">
+                                <div className="group bg-background border p-6 transition hover:shadow-md">
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-xl border bg-blue-500/10 text-blue-600">
                                         <PhoneIcon className="h-5 w-5" />
                                     </div>
                                     <h3 className="mt-6 text-xl font-semibold">Phone</h3>
                                     <p className="my-2.5 text-muted-foreground">
                                         Mon–Sat from 10am to 8pm.
                                     </p>
-                                    <Link className="font-medium text-primary" href="tel:+923001234567">
-                                        +92 300 1234567
-                                    </Link>
+                                    <div className="flex flex-col gap-2">
+                                        <Link
+                                            className="inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition hover:bg-muted underline-offset-4 hover:underline"
+                                            href="tel:03191994293"
+                                        >
+                                            <PhoneIcon className="h-4 w-4" />
+                                            0319 1994293
+                                        </Link>
+                                        <Link
+                                            className="inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition hover:bg-muted underline-offset-4 hover:underline"
+                                            href="tel:03390134186"
+                                        >
+                                            <PhoneIcon className="h-4 w-4" />
+                                            0339 0134186
+                                        </Link>
+                                    </div>
                                 </div>
                             </div>
+
 
                             <div className="w-full border bg-muted p-1 lg:ml-auto">
                                 <Card className="rounded-none bg-white/60 shadow-none">
