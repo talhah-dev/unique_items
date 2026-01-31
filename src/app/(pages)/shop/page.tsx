@@ -324,7 +324,7 @@ function ShopInner() {
         try {
             setLoading(true)
             setError("")
-            const res = await axios.get("/api/admin/products")
+            const res = await axios.get("/api/products")
             const list: Product[] = res.data?.products || []
             const publishedOnly = list.filter((p) => p.status === "published")
             setProducts(publishedOnly)

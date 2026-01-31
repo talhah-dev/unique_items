@@ -114,14 +114,14 @@ export default function HeroSlider() {
                                             </p>
 
                                             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                                                <Button asChild className="h-11 rounded-xl px-6">
+                                                <Button asChild className="h-11 hover:text-white rounded-xl px-6">
                                                     <Link href={s.ctaPrimary.href}>{s.ctaPrimary.label}</Link>
                                                 </Button>
 
                                                 <Button
                                                     asChild
                                                     variant="outline"
-                                                    className="h-11 rounded-xl border-white/30 bg-white/10 px-6 text-white hover:bg-white/15"
+                                                    className="h-11 hover:text-white rounded-xl border-white/30 bg-white/10 px-6 text-white hover:bg-white/15"
                                                 >
                                                     <Link href={s.ctaSecondary.href}>{s.ctaSecondary.label}</Link>
                                                 </Button>

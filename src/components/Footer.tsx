@@ -32,17 +32,17 @@ export default function Footer() {
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link href="/category/men" className="hover:text-white">
+                                    <Link href="/shop" className="hover:text-white">
                                         Men Watches
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link href="/category/women" className="hover:text-white">
+                                    <Link href="/shop" className="hover:text-white">
                                         Women Watches
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link href="/category/kids" className="hover:text-white">
+                                    <Link href="/shop" className="hover:text-white">
                                         Kids Watches
                                     </Link>
                                 </li>
@@ -65,7 +65,7 @@ export default function Footer() {
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link href="/faq" className="hover:text-white">
+                                    <Link href="/home#faq" className="hover:text-white">
                                         FAQs
                                     </Link>
                                 </li>

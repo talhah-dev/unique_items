@@ -152,3 +152,7 @@
 .animate-marquee-vertical {
   animation: marquee-vertical var(--duration) linear infinite;
 }
+
+*{
+  scroll-behavior: smooth;
+}

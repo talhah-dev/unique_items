@@ -96,7 +96,7 @@ export default function ProductDetailsPage({
             try {
                 setLoading(true)
 
-                const res = await axios.get("/api/admin/products")
+                const res = await axios.get("/api/products")
                 const products: Product[] = res.data?.products || []
 
                 const found = products.find(

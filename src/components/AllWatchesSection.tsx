@@ -87,7 +87,7 @@ export default function AllWatchesSection() {
     const fetchProducts = React.useCallback(async () => {
         try {
             setLoading(true)
-            const res = await axios.get("/api/admin/products")
+            const res = await axios.get("/api/products")
             const list: Product[] = res.data?.products || []
             const published = list.filter((p) => p.status === "published")
             setProducts(published.slice(0, 8))

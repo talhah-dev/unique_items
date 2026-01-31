@@ -183,6 +183,7 @@ export default function HomePg() {
                     </div>
                 </section>
 
+                <div className="" id="faq"></div>
                 <Faq />
 
                 <Testimonials />
