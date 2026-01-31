@@ -4,6 +4,7 @@ import Link from "next/link"
 import axios from "axios"
 import { useRef, useState } from "react"
 import { upload } from "@vercel/blob/client"
+import imageCompression from "browser-image-compression"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -22,9 +23,8 @@ import { toast } from "sonner"
 
 type Status = "published" | "draft"
 
-const MAX_IMAGE_BYTES = 1 * 1024 * 1024 // 1MB (change to 500 * 1024 for 500KB)
-// const MAX_IMAGE_BYTES = 500 * 1024
-
+const MAX_IMAGE_BYTES = 800 * 1024 // ✅ 800KB (change later if you want)
+const MAX_DIMENSION = 1600
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"]
 
 function slugify(input: string) {
@@ -36,8 +36,9 @@ function slugify(input: string) {
         .replace(/(^-|-$)+/g, "")
 }
 
-function bytesToLabel(bytes: number) {
-    if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)}MB`
+function prettySize(bytes: number) {
+    if (!Number.isFinite(bytes)) return "-"
+    if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(2)}MB`
     return `${Math.round(bytes / 1024)}KB`
 }
 
@@ -48,6 +49,7 @@ export default function AddNewProductPage() {
     const [uploading, setUploading] = useState(false)
     const [imageUrl, setImageUrl] = useState("")
     const [imageError, setImageError] = useState<string | null>(null)
+    const [imageInfo, setImageInfo] = useState<{ before: number; after: number } | null>(null)
 
     const [formData, setFormData] = useState({
         name: "",
@@ -60,46 +62,80 @@ export default function AddNewProductPage() {
         inStock: true,
     })
 
+    const resetFileInput = () => {
+        if (fileRef.current) fileRef.current.value = ""
+    }
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { id, value } = e.target
         setFormData((prev) => ({ ...prev, [id]: value }))
     }
 
     const handlePickImage = () => {
-        setImageError(null)
         fileRef.current?.click()
     }
 
-    const resetFileInput = () => {
-        if (fileRef.current) fileRef.current.value = ""
+    const removeImage = () => {
+        setImageUrl("")
+        setImageError(null)
+        setImageInfo(null)
+        resetFileInput()
     }
 
-    const validateImageFile = (file: File) => {
-        if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-            return `Only JPG, PNG, WEBP are allowed.`
+    const compressIfNeeded = async (file: File) => {
+        if (file.size <= MAX_IMAGE_BYTES) {
+            setImageInfo({ before: file.size, after: file.size })
+            return file
         }
-        if (file.size > MAX_IMAGE_BYTES) {
-            return `Image is too large. Max allowed is ${bytesToLabel(MAX_IMAGE_BYTES)} (your file is ${bytesToLabel(file.size)}).`
-        }
-        return null
+
+        toast(`Image is ${prettySize(file.size)}. Auto-compressing to under ${prettySize(MAX_IMAGE_BYTES)}...`)
+
+        const compressed = (await imageCompression(file, {
+            maxSizeMB: MAX_IMAGE_BYTES / (1024 * 1024),
+            maxWidthOrHeight: MAX_DIMENSION,
+            useWebWorker: true,
+            fileType: "image/webp",
+            initialQuality: 0.8,
+        })) as File
+
+        setImageInfo({ before: file.size, after: compressed.size })
+        return compressed
     }
 
     const handleUploadImage = async (file: File) => {
-        const err = validateImageFile(file)
-        if (err) {
-            setImageError(err)
-            toast(err)
+        setImageError(null)
+        setImageInfo(null)
+
+        if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+            const msg = "Only JPG, PNG, WEBP images are allowed."
+            setImageError(msg)
+            toast(msg)
             resetFileInput()
             return
         }
 
-        const uniqueName = `${crypto.randomUUID()}-${file.name}`
-
         try {
             setUploading(true)
-            setImageError(null)
 
-            const blob = await upload(uniqueName, file, {
+            // ✅ compress automatically if > 800KB
+            const compressed = await compressIfNeeded(file)
+
+            // ✅ if still too big (rare) — block
+            if (compressed.size > MAX_IMAGE_BYTES) {
+                const msg = `Image is still too large after compression (${prettySize(
+                    compressed.size
+                )}). Please choose a smaller image.`
+                setImageError(msg)
+                toast(msg)
+                resetFileInput()
+                return
+            }
+
+            toast(`Upload ready: ${prettySize(file.size)} → ${prettySize(compressed.size)}`)
+
+            const uniqueName = `${crypto.randomUUID()}-${file.name.replace(/\s+/g, "-")}.webp`
+
+            const blob = await upload(uniqueName, compressed, {
                 access: "public",
                 handleUploadUrl: "/api/upload",
             })
@@ -116,12 +152,6 @@ export default function AddNewProductPage() {
         }
     }
 
-    const removeImage = () => {
-        setImageUrl("")
-        setImageError(null)
-        resetFileInput()
-    }
-
     const handleSubmit = async () => {
         try {
             setLoading(true)
@@ -130,8 +160,8 @@ export default function AddNewProductPage() {
                 toast("Product name is required")
                 return
             }
-            if (!formData.price || Number(formData.price) <= 0) {
-                toast("Valid price is required")
+            if (!formData.price || Number.isNaN(Number(formData.price))) {
+                toast("Price is required")
                 return
             }
             if (!formData.category) {
@@ -140,10 +170,6 @@ export default function AddNewProductPage() {
             }
             if (!formData.collection) {
                 toast("Collection is required")
-                return
-            }
-            if (!imageUrl) {
-                toast("Product image is required")
                 return
             }
 
@@ -177,9 +203,10 @@ export default function AddNewProductPage() {
             })
             setImageUrl("")
             setImageError(null)
+            setImageInfo(null)
             resetFileInput()
         } catch (error: any) {
-            toast(error.response?.data?.message || "Something went wrong ❌")
+            toast(error?.response?.data?.message || "Something went wrong ❌")
         } finally {
             setLoading(false)
         }
@@ -321,11 +348,12 @@ export default function AddNewProductPage() {
                                 <CardHeader>
                                     <CardTitle>Product Image</CardTitle>
                                 </CardHeader>
+
                                 <CardContent className="space-y-4">
                                     <input
                                         ref={fileRef}
                                         type="file"
-                                        accept="image/jpeg,image/png,image/webp"
+                                        accept="image/*"
                                         className="hidden"
                                         onChange={(e) => {
                                             const file = e.target.files?.[0]
@@ -336,7 +364,7 @@ export default function AddNewProductPage() {
                                     <div
                                         className={
                                             "relative flex h-40 items-center justify-center rounded-2xl border border-dashed bg-zinc-50 overflow-hidden " +
-                                            (imageError ? "border-red-400" : "")
+                                            (imageError ? "border-red-500" : "")
                                         }
                                     >
                                         {imageUrl ? (
@@ -356,14 +384,30 @@ export default function AddNewProductPage() {
                                                 <UploadIcon className="mx-auto h-6 w-6 text-zinc-500" />
                                                 <p className="mt-2 text-sm text-zinc-600">Upload product image</p>
                                                 <p className="text-xs text-zinc-500">
-                                                    JPG, PNG, WEBP up to {bytesToLabel(MAX_IMAGE_BYTES)}
+                                                    JPG/PNG/WEBP — auto-compress to ≤ {prettySize(MAX_IMAGE_BYTES)}
                                                 </p>
                                             </div>
                                         )}
                                     </div>
 
+                                    {/* ✅ show message BEFORE upload when file is big (toast) + show info after */}
+                                    {imageInfo && (
+                                        <div className="rounded-xl border bg-white px-4 py-3 text-sm text-zinc-700">
+                                            Image size:{" "}
+                                            <span className="font-medium">{prettySize(imageInfo.before)}</span> →{" "}
+                                            <span className="font-medium">{prettySize(imageInfo.after)}</span>
+                                            {imageInfo.before > MAX_IMAGE_BYTES && (
+                                                <span className="ml-2 rounded-full bg-amber-100 px-2 py-1 text-xs text-amber-800">
+                                                    Auto-compressed
+                                                </span>
+                                            )}
+                                        </div>
+                                    )}
+
                                     {imageError && (
-                                        <p className="text-sm text-red-600">{imageError}</p>
+                                        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                                            {imageError}
+                                        </div>
                                     )}
 
                                     <Button
@@ -382,6 +426,7 @@ export default function AddNewProductPage() {
                                 <CardHeader>
                                     <CardTitle>Product Status</CardTitle>
                                 </CardHeader>
+
                                 <CardContent className="space-y-4">
                                     <div className="space-y-2">
                                         <Label>Visibility</Label>
