@@ -22,6 +22,11 @@ import { toast } from "sonner"
 
 type Status = "published" | "draft"
 
+const MAX_IMAGE_BYTES = 1 * 1024 * 1024 // 1MB (change to 500 * 1024 for 500KB)
+// const MAX_IMAGE_BYTES = 500 * 1024
+
+const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"]
+
 function slugify(input: string) {
     return input
         .toLowerCase()
@@ -31,12 +36,18 @@ function slugify(input: string) {
         .replace(/(^-|-$)+/g, "")
 }
 
+function bytesToLabel(bytes: number) {
+    if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)}MB`
+    return `${Math.round(bytes / 1024)}KB`
+}
+
 export default function AddNewProductPage() {
     const fileRef = useRef<HTMLInputElement | null>(null)
 
     const [loading, setLoading] = useState(false)
     const [uploading, setUploading] = useState(false)
     const [imageUrl, setImageUrl] = useState("")
+    const [imageError, setImageError] = useState<string | null>(null)
 
     const [formData, setFormData] = useState({
         name: "",
@@ -49,30 +60,57 @@ export default function AddNewProductPage() {
         inStock: true,
     })
 
-    const handleChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-    ) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { id, value } = e.target
         setFormData((prev) => ({ ...prev, [id]: value }))
     }
 
     const handlePickImage = () => {
+        setImageError(null)
         fileRef.current?.click()
     }
 
+    const resetFileInput = () => {
+        if (fileRef.current) fileRef.current.value = ""
+    }
+
+    const validateImageFile = (file: File) => {
+        if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+            return `Only JPG, PNG, WEBP are allowed.`
+        }
+        if (file.size > MAX_IMAGE_BYTES) {
+            return `Image is too large. Max allowed is ${bytesToLabel(MAX_IMAGE_BYTES)} (your file is ${bytesToLabel(file.size)}).`
+        }
+        return null
+    }
 
     const handleUploadImage = async (file: File) => {
+        const err = validateImageFile(file)
+        if (err) {
+            setImageError(err)
+            toast(err)
+            resetFileInput()
+            return
+        }
+
         const uniqueName = `${crypto.randomUUID()}-${file.name}`
 
         try {
             setUploading(true)
+            setImageError(null)
+
             const blob = await upload(uniqueName, file, {
                 access: "public",
                 handleUploadUrl: "/api/upload",
             })
+
             setImageUrl(blob.url)
+            toast("Image uploaded ✅")
         } catch (e: any) {
-            toast(e?.message || "Image upload failed")
+            const msg = e?.message || "Image upload failed"
+            setImageError(msg)
+            toast(msg)
+            resetFileInput()
         } finally {
             setUploading(false)
         }
@@ -80,7 +118,8 @@ export default function AddNewProductPage() {
 
     const removeImage = () => {
         setImageUrl("")
-        if (fileRef.current) fileRef.current.value = ""
+        setImageError(null)
+        resetFileInput()
     }
 
     const handleSubmit = async () => {
@@ -89,6 +128,22 @@ export default function AddNewProductPage() {
 
             if (!formData.name.trim()) {
                 toast("Product name is required")
+                return
+            }
+            if (!formData.price || Number(formData.price) <= 0) {
+                toast("Valid price is required")
+                return
+            }
+            if (!formData.category) {
+                toast("Category is required")
+                return
+            }
+            if (!formData.collection) {
+                toast("Collection is required")
+                return
+            }
+            if (!imageUrl) {
+                toast("Product image is required")
                 return
             }
 
@@ -121,7 +176,8 @@ export default function AddNewProductPage() {
                 inStock: true,
             })
             setImageUrl("")
-            if (fileRef.current) fileRef.current.value = ""
+            setImageError(null)
+            resetFileInput()
         } catch (error: any) {
             toast(error.response?.data?.message || "Something went wrong ❌")
         } finally {
@@ -207,9 +263,7 @@ export default function AddNewProductPage() {
                                         <Label>Category</Label>
                                         <Select
                                             value={formData.category}
-                                            onValueChange={(v) =>
-                                                setFormData((p) => ({ ...p, category: v }))
-                                            }
+                                            onValueChange={(v) => setFormData((p) => ({ ...p, category: v }))}
                                         >
                                             <SelectTrigger className="h-11">
                                                 <SelectValue placeholder="Select category" />
@@ -227,9 +281,7 @@ export default function AddNewProductPage() {
                                         <Label>Collection</Label>
                                         <Select
                                             value={formData.collection}
-                                            onValueChange={(v) =>
-                                                setFormData((p) => ({ ...p, collection: v }))
-                                            }
+                                            onValueChange={(v) => setFormData((p) => ({ ...p, collection: v }))}
                                         >
                                             <SelectTrigger className="h-11">
                                                 <SelectValue placeholder="Select collection" />
@@ -273,7 +325,7 @@ export default function AddNewProductPage() {
                                     <input
                                         ref={fileRef}
                                         type="file"
-                                        accept="image/*"
+                                        accept="image/jpeg,image/png,image/webp"
                                         className="hidden"
                                         onChange={(e) => {
                                             const file = e.target.files?.[0]
@@ -281,14 +333,15 @@ export default function AddNewProductPage() {
                                         }}
                                     />
 
-                                    <div className="relative flex h-40 items-center justify-center rounded-2xl border border-dashed bg-zinc-50 overflow-hidden">
+                                    <div
+                                        className={
+                                            "relative flex h-40 items-center justify-center rounded-2xl border border-dashed bg-zinc-50 overflow-hidden " +
+                                            (imageError ? "border-red-400" : "")
+                                        }
+                                    >
                                         {imageUrl ? (
                                             <>
-                                                <img
-                                                    src={imageUrl}
-                                                    alt="Product"
-                                                    className="h-full w-full object-cover"
-                                                />
+                                                <img src={imageUrl} alt="Product" className="h-full w-full object-cover" />
                                                 <button
                                                     type="button"
                                                     onClick={removeImage}
@@ -301,15 +354,17 @@ export default function AddNewProductPage() {
                                         ) : (
                                             <div className="text-center">
                                                 <UploadIcon className="mx-auto h-6 w-6 text-zinc-500" />
-                                                <p className="mt-2 text-sm text-zinc-600">
-                                                    Upload product image
-                                                </p>
+                                                <p className="mt-2 text-sm text-zinc-600">Upload product image</p>
                                                 <p className="text-xs text-zinc-500">
-                                                    PNG, JPG up to 5MB
+                                                    JPG, PNG, WEBP up to {bytesToLabel(MAX_IMAGE_BYTES)}
                                                 </p>
                                             </div>
                                         )}
                                     </div>
+
+                                    {imageError && (
+                                        <p className="text-sm text-red-600">{imageError}</p>
+                                    )}
 
                                     <Button
                                         type="button"
@@ -332,9 +387,7 @@ export default function AddNewProductPage() {
                                         <Label>Visibility</Label>
                                         <Select
                                             value={formData.status}
-                                            onValueChange={(v: Status) =>
-                                                setFormData((p) => ({ ...p, status: v }))
-                                            }
+                                            onValueChange={(v: Status) => setFormData((p) => ({ ...p, status: v }))}
                                         >
                                             <SelectTrigger className="h-11">
                                                 <SelectValue placeholder="Select visibility" />
@@ -350,9 +403,7 @@ export default function AddNewProductPage() {
                                         <Label>Stock</Label>
                                         <Select
                                             value={formData.inStock ? "in" : "out"}
-                                            onValueChange={(v) =>
-                                                setFormData((p) => ({ ...p, inStock: v === "in" }))
-                                            }
+                                            onValueChange={(v) => setFormData((p) => ({ ...p, inStock: v === "in" }))}
                                         >
                                             <SelectTrigger className="h-11">
                                                 <SelectValue placeholder="Select stock" />
