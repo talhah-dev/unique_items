@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { Suspense } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import axios from "axios"
@@ -295,7 +296,10 @@ function ProductCard({
     )
 }
 
-export default function ShopPage() {
+/** ✅ This component can safely use useSearchParams */
+function ShopInner() {
+    const searchParams = useSearchParams()
+
     const [loading, setLoading] = React.useState(true)
     const [products, setProducts] = React.useState<Product[]>([])
     const [error, setError] = React.useState("")
@@ -340,6 +344,12 @@ export default function ShopPage() {
         setPrice([min, max])
     }, [min, max])
 
+    /** ✅ read q from URL */
+    React.useEffect(() => {
+        const q = searchParams.get("q") || ""
+        setQuery(q)
+    }, [searchParams])
+
     const clearAll = () => {
         setCategory("all")
         setQuery("")
@@ -379,14 +389,6 @@ export default function ShopPage() {
         setAddedIds((prev) => ({ ...prev, [p._id]: true }))
         toast("Added to cart.")
     }
-
-
-    const searchParams = useSearchParams()
-
-    React.useEffect(() => {
-        const q = searchParams.get("q") || ""
-        setQuery(q)
-    }, [searchParams])
 
     return (
         <UserWrapper>
@@ -501,5 +503,14 @@ export default function ShopPage() {
                 </section>
             </div>
         </UserWrapper>
+    )
+}
+
+/** ✅ Page exported with Suspense wrapper (fixes prerender build error) */
+export default function ShopPage() {
+    return (
+        <Suspense fallback={<div className="p-10">Loading...</div>}>
+            <ShopInner />
+        </Suspense>
     )
 }
