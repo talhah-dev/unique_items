@@ -1,119 +1,130 @@
-import React from "react";
-import Link from "next/link";
-import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { Heart, Eye, Expand, ArrowRight } from "lucide-react";
-import { cn } from "@/lib/utils";
+"use client"
+
+import * as React from "react"
+import Link from "next/link"
+import Image from "next/image"
+import axios from "axios"
+import { toast } from "sonner"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { ArrowRight } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 type Product = {
-    id: string;
-    title: string;
-    image: string;
-    href: string;
-    discountPercent?: number;
-    soldOut?: boolean;
-    oldPrice?: number;
-    price: number;
-    showActions?: boolean;
-    cta: "ADD_TO_CART" | "READ_MORE";
-};
+    _id: string
+    name: string
+    slug: string
+    price: number
+    oldPrice?: number | null
+    category: string
+    collection: string
+    description?: string
+    imageUrl?: string
+    status: "published" | "draft"
+    inStock: boolean
+}
 
-const products: Product[] = [
-    {
-        id: "p1",
-        title: "Patek philip silver with black dial with day&date",
-        image: "/images/hero/hero-bg-2.png",
-        href: "/products/p1",
-        discountPercent: 9,
-        soldOut: true,
-        oldPrice: 4250,
-        price: 3850,
-        cta: "READ_MORE",
-    },
-    {
-        id: "p2",
-        title: "Patek philip silver with white dial",
-        image: "/images/hero/hero-bg-2.png",
-        href: "/products/p2",
-        discountPercent: 9,
-        soldOut: true,
-        oldPrice: 4250,
-        price: 3850,
-        cta: "READ_MORE",
-    },
-    {
-        id: "p3",
-        title: "Patek philip silver with tifny dial",
-        image: "/images/hero/hero-bg-2.png",
-        href: "/products/p3",
-        discountPercent: 9,
-        oldPrice: 4250,
-        price: 3850,
-        showActions: true,
-        cta: "ADD_TO_CART",
-    },
-    {
-        id: "p4",
-        title: "Patek philip black with black dial with date",
-        image: "/images/hero/hero-bg-2.png",
-        href: "/products/p4",
-        discountPercent: 9,
-        oldPrice: 4250,
-        price: 3850,
-        cta: "ADD_TO_CART",
-    },
-    {
-        id: "p1",
-        title: "Patek philip silver with black dial with day&date",
-        image: "/images/hero/hero-bg-2.png",
-        href: "/products/p1",
-        discountPercent: 9,
-        soldOut: true,
-        oldPrice: 4250,
-        price: 3850,
-        cta: "READ_MORE",
-    },
-    {
-        id: "p2",
-        title: "Patek philip silver with white dial",
-        image: "/images/hero/hero-bg-2.png",
-        href: "/products/p2",
-        discountPercent: 9,
-        soldOut: true,
-        oldPrice: 4250,
-        price: 3850,
-        cta: "READ_MORE",
-    },
-    {
-        id: "p3",
-        title: "Patek philip silver with tifny dial",
-        image: "/images/hero/hero-bg-2.png",
-        href: "/products/p3",
-        discountPercent: 9,
-        oldPrice: 4250,
-        price: 3850,
-        showActions: true,
-        cta: "ADD_TO_CART",
-    },
-    {
-        id: "p4",
-        title: "Patek philip black with black dial with date",
-        image: "/images/hero/hero-bg-2.png",
-        href: "/products/p4",
-        discountPercent: 9,
-        oldPrice: 4250,
-        price: 3850,
-        cta: "ADD_TO_CART",
-    },
-];
+type CartItem = {
+    id: string
+    slug: string
+    name: string
+    price: number
+    imageUrl: string
+    qty: number
+}
 
 function formatPKR(value: number) {
-    return `Rs.${value.toLocaleString("en-US")}.00`;
+    const v = Number.isFinite(value) ? value : 0
+    return `Rs.${v.toLocaleString("en-US")}.00`
+}
+
+function safeImage(url?: string) {
+    return url?.trim() ? url : "/images/placeholder.png"
+}
+
+function readCart(): CartItem[] {
+    if (typeof window === "undefined") return []
+    try {
+        const raw = localStorage.getItem("cart")
+        if (!raw) return []
+        const parsed = JSON.parse(raw)
+        if (!Array.isArray(parsed)) return []
+        return parsed
+    } catch {
+        return []
+    }
+}
+
+function writeCart(items: CartItem[]) {
+    if (typeof window === "undefined") return
+    localStorage.setItem("cart", JSON.stringify(items))
+}
+
+function addToCart(item: Omit<CartItem, "qty">) {
+    const cart = readCart()
+    const idx = cart.findIndex((x) => x.id === item.id)
+    if (idx >= 0) {
+        cart[idx] = { ...cart[idx], qty: (cart[idx].qty || 1) + 1 }
+    } else {
+        cart.push({ ...item, qty: 1 })
+    }
+    writeCart(cart)
+    return cart
 }
 
 export default function AllWatchesSection() {
+    const [loading, setLoading] = React.useState(true)
+    const [products, setProducts] = React.useState<Product[]>([])
+    const [addedIds, setAddedIds] = React.useState<Record<string, boolean>>({})
+
+    const syncAddedState = React.useCallback(() => {
+        const cart = readCart()
+        const map: Record<string, boolean> = {}
+        for (const item of cart) map[item.id] = true
+        setAddedIds(map)
+    }, [])
+
+    const fetchProducts = React.useCallback(async () => {
+        try {
+            setLoading(true)
+            const res = await axios.get("/api/admin/products")
+            const list: Product[] = res.data?.products || []
+            const published = list.filter((p) => p.status === "published")
+            setProducts(published.slice(0, 8))
+        } catch (e: any) {
+            toast(e?.response?.data?.message || "Failed to load products")
+            setProducts([])
+        } finally {
+            setLoading(false)
+        }
+    }, [])
+
+    React.useEffect(() => {
+        fetchProducts()
+        syncAddedState()
+
+        const onStorage = (e: StorageEvent) => {
+            if (e.key === "cart") syncAddedState()
+        }
+        window.addEventListener("storage", onStorage)
+        return () => window.removeEventListener("storage", onStorage)
+    }, [fetchProducts, syncAddedState])
+
+    const handleAdd = (p: Product) => {
+        if (!p.inStock) return
+        addToCart({
+            id: p._id,
+            slug: p.slug,
+            name: p.name,
+            price: p.price,
+            imageUrl: safeImage(p.imageUrl),
+        })
+        setAddedIds((prev) => ({ ...prev, [p._id]: true }))
+        toast("Added to cart.")
+    }
+
     return (
-        <section className="w-full ">
+        <section className="w-full">
             <div className="mx-auto max-w-7xl px-4 pt-8 lg:pt-10">
                 <div className="flex items-end justify-between gap-4">
                     <div>
@@ -125,104 +136,112 @@ export default function AllWatchesSection() {
                         </p>
                     </div>
 
-                    <Button className="hidden rounded-full px-5 sm:inline-flex">
+                    <Button asChild className="hidden rounded-full px-5 sm:inline-flex">
                         <Link href="/shop" className="inline-flex items-center gap-2">
                             View All <ArrowRight className="h-4 w-4" />
                         </Link>
                     </Button>
                 </div>
 
-                <div className="mt-10 grid gap-5 sm:grid-cols-2 md:gap-y-20 gap-y-10 lg:grid-cols-4">
-                    {products.map((p, idx) => (
-                        <div key={idx} className="group">
-                            <div className="relative overflow-hidden rounded-2xl bg-zinc-50">
-                                <Link href={p.href} className="block">
-                                    <div className="relative aspect-[4/5] w-full">
-                                        <Image
-                                            src={p.image}
-                                            alt={p.title}
-                                            fill
-                                            className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                                            priority={false}
-                                        />
-                                    </div>
-                                </Link>
-
-                                {typeof p.discountPercent === "number" && (
-                                    <div className="absolute left-3 top-3 grid place-items-center rounded-full bg-red-600 px-4 py-3 text-sm font-semibold text-white">
-                                        -{p.discountPercent}%
-                                    </div>
-                                )}
-
-                                {p.soldOut && (
-                                    <div className="absolute left-3 top-16 grid place-items-center rounded-full bg-zinc-500 px-4 py-3 text-sm font-medium text-white">
-                                        Sold out
-                                    </div>
-                                )}
-
-                                {p.showActions && (
-                                    <div className="absolute right-3 top-3 flex flex-col gap-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                                        <button
-                                            type="button"
-                                            className="grid h-11 w-11 place-items-center rounded-full bg-white text-zinc-900 shadow-sm ring-1 ring-zinc-200 hover:bg-zinc-900 hover:text-white"
-                                            aria-label="Add to wishlist"
-                                        >
-                                            <Heart className="h-5 w-5" />
-                                        </button>
-                                        <button
-                                            type="button"
-                                            className="grid h-11 w-11 place-items-center rounded-full bg-white text-zinc-900 shadow-sm ring-1 ring-zinc-200 hover:bg-zinc-900 hover:text-white"
-                                            aria-label="Quick view"
-                                        >
-                                            <Eye className="h-5 w-5" />
-                                        </button>
-                                        <button
-                                            type="button"
-                                            className="grid h-11 w-11 place-items-center rounded-full bg-white text-zinc-900 shadow-sm ring-1 ring-zinc-200 hover:bg-zinc-900 hover:text-white"
-                                            aria-label="Expand image"
-                                        >
-                                            <Expand className="h-5 w-5" />
-                                        </button>
-                                    </div>
-                                )}
+                {loading ? (
+                    <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                        {Array.from({ length: 8 }).map((_, i) => (
+                            <div key={i} className="rounded-2xl border bg-zinc-50 p-4">
+                                <div className="aspect-[4/5] w-full rounded-xl bg-zinc-200/60" />
+                                <div className="mt-4 h-4 w-3/4 rounded bg-zinc-200/60" />
+                                <div className="mt-2 h-4 w-1/2 rounded bg-zinc-200/60" />
+                                <div className="mt-5 h-11 w-full rounded-full bg-zinc-200/60" />
                             </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="mt-10 grid gap-5 sm:grid-cols-2 md:gap-y-20 gap-y-10 lg:grid-cols-4">
+                        {products.map((p) => {
+                            const discount =
+                                typeof p.oldPrice === "number" && p.oldPrice > p.price
+                                    ? Math.round(((p.oldPrice - p.price) / p.oldPrice) * 100)
+                                    : null
 
-                            <div className="mt-4">
-                                <Link
-                                    href={p.href}
-                                    className="line-clamp-1 text-sm font-medium text-zinc-900 hover:underline"
-                                >
-                                    {p.title}
-                                </Link>
+                            const added = Boolean(addedIds[p._id])
 
-                                <div className="mt-2 flex items-center gap-2">
-                                    {typeof p.oldPrice === "number" && (
-                                        <span className="text-sm text-zinc-500 line-through">
-                                            {formatPKR(p.oldPrice)}
-                                        </span>
-                                    )}
-                                    <span className="text-sm font-semibold text-red-600">
-                                        {formatPKR(p.price)}
-                                    </span>
-                                </div>
-
-                                <div className="mt-5">
-                                    <Button
-                                        asChild
-                                        variant="outline"
-                                        className={cn(
-                                            "h-11 w-full rounded-full border-zinc-900 text-zinc-900 hover:bg-zinc-900 hover:text-white"
-                                        )}
-                                    >
-                                        <Link href={p.href}>
-                                            {p.cta === "ADD_TO_CART" ? "ADD TO CART" : "READ MORE"}
+                            return (
+                                <div key={p._id} className="group">
+                                    <div className="relative overflow-hidden rounded-2xl bg-zinc-50">
+                                        <Link href={`/products/${p.slug}`} className="block">
+                                            <div className="relative aspect-[4/5] w-full">
+                                                <Image
+                                                    src={safeImage(p.imageUrl)}
+                                                    alt={p.name}
+                                                    fill
+                                                    className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                                                />
+                                            </div>
                                         </Link>
-                                    </Button>
+
+                                        {discount !== null && (
+                                            <div className="absolute left-3 top-3 grid place-items-center rounded-full bg-red-600 px-4 py-3 text-sm font-semibold text-white">
+                                                -{discount}%
+                                            </div>
+                                        )}
+
+                                        {!p.inStock && (
+                                            <div className="absolute left-3 top-16 grid place-items-center rounded-full bg-zinc-500 px-4 py-3 text-sm font-medium text-white">
+                                                Sold out
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="mt-4">
+                                        <Link
+                                            href={`/products/${p.slug}`}
+                                            className="line-clamp-1 text-sm font-medium text-zinc-900 hover:underline"
+                                        >
+                                            {p.name}
+                                        </Link>
+
+                                        <div className="mt-2 flex items-center gap-2">
+                                            {typeof p.oldPrice === "number" && (
+                                                <span className="text-sm text-zinc-500 line-through">
+                                                    {formatPKR(p.oldPrice)}
+                                                </span>
+                                            )}
+                                            <span className="text-sm font-semibold text-red-600">
+                                                {formatPKR(p.price)}
+                                            </span>
+
+                                            {!p.inStock && (
+                                                <Badge variant="secondary" className="ml-auto rounded-full">
+                                                    Sold Out
+                                                </Badge>
+                                            )}
+                                        </div>
+
+                                        <div className="mt-5">
+                                            {added ? (
+                                                <Button asChild className="h-11 w-full rounded-full">
+                                                    <Link href="/cart">View Cart</Link>
+                                                </Button>
+                                            ) : (
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    className={cn(
+                                                        "h-11 w-full rounded-full border-zinc-900 text-zinc-900 hover:bg-zinc-900 hover:text-white",
+                                                        !p.inStock && "pointer-events-none opacity-60"
+                                                    )}
+                                                    onClick={() => handleAdd(p)}
+                                                    disabled={!p.inStock}
+                                                >
+                                                    ADD TO CART
+                                                </Button>
+                                            )}
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                            )
+                        })}
+                    </div>
+                )}
 
                 <div className="mt-10 flex justify-center sm:hidden">
                     <Button asChild className="rounded-full px-6">
@@ -233,5 +252,5 @@ export default function AllWatchesSection() {
                 </div>
             </div>
         </section>
-    );
+    )
 }

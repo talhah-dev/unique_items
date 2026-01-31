@@ -2,7 +2,8 @@
 
 import Link from "next/link"
 import axios from "axios"
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
+import { useParams, useRouter } from "next/navigation"
 import { upload } from "@vercel/blob/client"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -18,26 +19,35 @@ import {
 } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { ArrowLeft, Upload as UploadIcon, X } from "lucide-react"
-import { toast } from "sonner"
 
 type Status = "published" | "draft"
 
-function slugify(input: string) {
-    return input
-        .toLowerCase()
-        .trim()
-        .replace(/['"]/g, "")
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)+/g, "")
+type Product = {
+    _id: string
+    name: string
+    slug: string
+    price: number
+    oldPrice?: number | null
+    category: string
+    collection: string
+    description?: string
+    imageUrl?: string
+    status: Status
+    inStock: boolean
 }
 
-export default function AddNewProductPage() {
+export default function EditProductPage() {
+    const router = useRouter()
+    const params = useParams<{ id: string }>()
+    const id = params?.id
+
     const fileRef = useRef<HTMLInputElement | null>(null)
 
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(true)
+    const [saving, setSaving] = useState(false)
     const [uploading, setUploading] = useState(false)
-    const [imageUrl, setImageUrl] = useState("")
 
+    const [imageUrl, setImageUrl] = useState("")
     const [formData, setFormData] = useState({
         name: "",
         price: "",
@@ -48,6 +58,34 @@ export default function AddNewProductPage() {
         status: "published" as Status,
         inStock: true,
     })
+
+    const fetchProduct = async () => {
+        try {
+            setLoading(true)
+            const res = await axios.get(`/api/admin/products/${id}`)
+            const p: Product = res.data.product
+
+            setFormData({
+                name: p.name || "",
+                price: String(p.price ?? ""),
+                oldPrice: p.oldPrice === null || p.oldPrice === undefined ? "" : String(p.oldPrice),
+                category: p.category || "",
+                collection: p.collection || "",
+                description: p.description || "",
+                status: p.status || "published",
+                inStock: Boolean(p.inStock),
+            })
+            setImageUrl(p.imageUrl || "")
+        } catch (e: any) {
+            alert(e?.response?.data?.message || "Failed to load product")
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    useEffect(() => {
+        if (id) fetchProduct()
+    }, [id])
 
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -60,19 +98,16 @@ export default function AddNewProductPage() {
         fileRef.current?.click()
     }
 
-
     const handleUploadImage = async (file: File) => {
-        const uniqueName = `${crypto.randomUUID()}-${file.name}`
-
         try {
             setUploading(true)
-            const blob = await upload(uniqueName, file, {
+            const blob = await upload(file.name, file, {
                 access: "public",
                 handleUploadUrl: "/api/upload",
             })
             setImageUrl(blob.url)
         } catch (e: any) {
-            toast(e?.message || "Image upload failed")
+            alert(e?.message || "Image upload failed")
         } finally {
             setUploading(false)
         }
@@ -83,21 +118,17 @@ export default function AddNewProductPage() {
         if (fileRef.current) fileRef.current.value = ""
     }
 
-    const handleSubmit = async () => {
+    const handleSave = async () => {
         try {
-            setLoading(true)
+            setSaving(true)
 
             if (!formData.name.trim()) {
-                toast("Product name is required")
+                alert("Product name is required")
                 return
             }
 
-            const baseSlug = slugify(formData.name)
-            const uniqueSlug = `${baseSlug}-${Date.now()}`
-
-            await axios.post("/api/admin/products", {
+            await axios.patch(`/api/admin/products/${id}`, {
                 name: formData.name,
-                slug: uniqueSlug,
                 price: Number(formData.price),
                 oldPrice: formData.oldPrice ? Number(formData.oldPrice) : null,
                 category: formData.category,
@@ -108,25 +139,21 @@ export default function AddNewProductPage() {
                 inStock: formData.inStock,
             })
 
-            toast("Product created successfully ✅")
-
-            setFormData({
-                name: "",
-                price: "",
-                oldPrice: "",
-                category: "",
-                collection: "",
-                description: "",
-                status: "published",
-                inStock: true,
-            })
-            setImageUrl("")
-            if (fileRef.current) fileRef.current.value = ""
-        } catch (error: any) {
-            toast(error.response?.data?.message || "Something went wrong ❌")
+            alert("Product updated successfully ✅")
+            router.push("/admin/products")
+        } catch (e: any) {
+            alert(e?.response?.data?.message || "Failed to update product")
         } finally {
-            setLoading(false)
+            setSaving(false)
         }
+    }
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-white">
+                <div className="mx-auto max-w-7xl px-4 py-10">Loading...</div>
+            </div>
+        )
     }
 
     return (
@@ -139,17 +166,17 @@ export default function AddNewProductPage() {
                                 Products
                             </Badge>
                             <h1 className="mt-3 text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl">
-                                Add New Product
+                                Edit Product
                             </h1>
                             <p className="mt-2 max-w-2xl text-sm text-zinc-600 sm:text-base">
-                                Create a new watch product for your store.
+                                Update your product details.
                             </p>
                         </div>
 
                         <Button asChild variant="outline" className="h-11 rounded-xl px-5">
-                            <Link href="/admin">
+                            <Link href="/admin/products">
                                 <ArrowLeft className="mr-2 h-4 w-4" />
-                                Back to Dashboard
+                                Back to Products
                             </Link>
                         </Button>
                     </div>
@@ -169,7 +196,6 @@ export default function AddNewProductPage() {
                                     <Label htmlFor="name">Product Name</Label>
                                     <Input
                                         id="name"
-                                        placeholder="Classic Chrono Black Dial"
                                         value={formData.name}
                                         onChange={handleChange}
                                         className="h-11"
@@ -182,7 +208,6 @@ export default function AddNewProductPage() {
                                         <Input
                                             id="price"
                                             type="number"
-                                            placeholder="4999"
                                             value={formData.price}
                                             onChange={handleChange}
                                             className="h-11"
@@ -194,7 +219,6 @@ export default function AddNewProductPage() {
                                         <Input
                                             id="oldPrice"
                                             type="number"
-                                            placeholder="6499"
                                             value={formData.oldPrice}
                                             onChange={handleChange}
                                             className="h-11"
@@ -248,18 +272,10 @@ export default function AddNewProductPage() {
                                     <Label>Description</Label>
                                     <Textarea
                                         id="description"
-                                        placeholder="Write product description..."
                                         value={formData.description}
                                         onChange={handleChange}
                                         className="min-h-[120px]"
                                     />
-                                </div>
-
-                                <div className="rounded-2xl border bg-zinc-50 p-4">
-                                    <p className="text-xs text-zinc-500">Slug (auto-generated)</p>
-                                    <p className="mt-1 text-sm font-medium text-zinc-900">
-                                        {formData.name ? slugify(formData.name) : "-"}
-                                    </p>
                                 </div>
                             </CardContent>
                         </Card>
@@ -367,10 +383,10 @@ export default function AddNewProductPage() {
                                     <Button
                                         type="button"
                                         className="w-full h-11 rounded-xl"
-                                        onClick={handleSubmit}
-                                        disabled={loading || uploading}
+                                        onClick={handleSave}
+                                        disabled={saving || uploading}
                                     >
-                                        {loading ? "Saving..." : "Save Product"}
+                                        {saving ? "Saving..." : "Save Changes"}
                                     </Button>
                                 </CardContent>
                             </Card>

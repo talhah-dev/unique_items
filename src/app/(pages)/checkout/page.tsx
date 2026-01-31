@@ -1,16 +1,198 @@
-import Image from "next/image";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { ShieldCheck, Truck, Wallet } from "lucide-react";
-import UserWrapper from "@/app/(wrappers)/userWrapper";
+"use client"
+
+import * as React from "react"
+import Image from "next/image"
+import Link from "next/link"
+import { toast } from "sonner"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Textarea } from "@/components/ui/textarea"
+import { Badge } from "@/components/ui/badge"
+import { ShieldCheck, Truck, Wallet } from "lucide-react"
+import UserWrapper from "@/app/(wrappers)/userWrapper"
+
+type CartItem = {
+    id: string
+    slug: string
+    name: string
+    price: number
+    imageUrl: string
+    qty: number
+}
+
+type PaymentMethod = "cod" | "online"
+
+type CheckoutForm = {
+    firstName: string
+    lastName: string
+    phone: string
+    email: string
+    address: string
+    city: string
+    postal: string
+    paymentMethod: PaymentMethod
+}
+
+type CheckoutStorage = {
+    form: CheckoutForm
+    cart: CartItem[]
+    subtotal: number
+    shipping: number
+    total: number
+    createdAt: string
+}
+
+const SHIPPING_FEE = 200
+
+function safeImage(url?: string) {
+    return url?.trim() ? url : "/images/placeholder.png"
+}
+
+function readCart(): CartItem[] {
+    if (typeof window === "undefined") return []
+    try {
+        const raw = localStorage.getItem("cart")
+        if (!raw) return []
+        const parsed = JSON.parse(raw)
+        if (!Array.isArray(parsed)) return []
+        return parsed
+    } catch {
+        return []
+    }
+}
+
+function formatPKR(n: number) {
+    const v = Number.isFinite(n) ? n : 0
+    return `₨ ${v.toLocaleString("en-PK")}`
+}
+
+function readCheckoutForm(): CheckoutForm {
+    if (typeof window === "undefined") {
+        return {
+            firstName: "",
+            lastName: "",
+            phone: "",
+            email: "",
+            address: "",
+            city: "",
+            postal: "",
+            paymentMethod: "cod",
+        }
+    }
+
+    try {
+        const raw = localStorage.getItem("checkout_form")
+        if (!raw) {
+            return {
+                firstName: "",
+                lastName: "",
+                phone: "",
+                email: "",
+                address: "",
+                city: "",
+                postal: "",
+                paymentMethod: "cod",
+            }
+        }
+        const parsed = JSON.parse(raw)
+        return {
+            firstName: String(parsed.firstName || ""),
+            lastName: String(parsed.lastName || ""),
+            phone: String(parsed.phone || ""),
+            email: String(parsed.email || ""),
+            address: String(parsed.address || ""),
+            city: String(parsed.city || ""),
+            postal: String(parsed.postal || ""),
+            paymentMethod: parsed.paymentMethod === "online" ? "online" : "cod",
+        }
+    } catch {
+        return {
+            firstName: "",
+            lastName: "",
+            phone: "",
+            email: "",
+            address: "",
+            city: "",
+            postal: "",
+            paymentMethod: "cod",
+        }
+    }
+}
+
+function writeCheckoutForm(form: CheckoutForm) {
+    if (typeof window === "undefined") return
+    localStorage.setItem("checkout_form", JSON.stringify(form))
+}
+
+function writeCheckoutData(data: CheckoutStorage) {
+    if (typeof window === "undefined") return
+    localStorage.setItem("checkout_data", JSON.stringify(data))
+}
 
 export default function CheckoutPage() {
+    const [form, setForm] = React.useState<CheckoutForm>(() => readCheckoutForm())
+    const [cart, setCart] = React.useState<CartItem[]>([])
+    const [placing, setPlacing] = React.useState(false)
+
+    React.useEffect(() => {
+        setCart(readCart())
+    }, [])
+
+    React.useEffect(() => {
+        writeCheckoutForm(form)
+    }, [form])
+
+    const subtotal = React.useMemo(() => {
+        return cart.reduce((sum, i) => sum + i.price * i.qty, 0)
+    }, [cart])
+
+    const total = subtotal + (cart.length ? SHIPPING_FEE : 0)
+
+    const update = (key: keyof CheckoutForm, value: string | PaymentMethod) => {
+        setForm((p) => ({ ...p, [key]: value as any }))
+    }
+
+    const validate = () => {
+        if (!form.firstName.trim()) return "First name is required"
+        if (!form.lastName.trim()) return "Last name is required"
+        if (!form.phone.trim()) return "Phone number is required"
+        if (!form.address.trim()) return "Address is required"
+        if (!form.city.trim()) return "City is required"
+        if (cart.length === 0) return "Your cart is empty"
+        return ""
+    }
+
+    const placeOrder = async () => {
+        const msg = validate()
+        if (msg) {
+            toast(msg)
+            return
+        }
+
+        try {
+            setPlacing(true)
+
+            const payload: CheckoutStorage = {
+                form,
+                cart,
+                subtotal,
+                shipping: SHIPPING_FEE,
+                total,
+                createdAt: new Date().toISOString(),
+            }
+
+            writeCheckoutData(payload)
+            toast("Order saved. Proceeding...")
+
+            window.location.href = "/payment-confirmation"
+        } finally {
+            setPlacing(false)
+        }
+    }
+
     return (
         <UserWrapper>
             <div className="min-h-screen bg-white">
@@ -23,8 +205,7 @@ export default function CheckoutPage() {
                             Complete your order
                         </h1>
                         <p className="mt-2 max-w-2xl text-sm text-zinc-600 sm:text-base">
-                            Enter your shipping details and confirm your payment method. Cash on
-                            Delivery (COD) is available.
+                            Enter your shipping details and confirm your payment method. Cash on Delivery (COD) is available.
                         </p>
 
                         <div className="mt-6 grid gap-3 sm:grid-cols-3">
@@ -64,27 +245,54 @@ export default function CheckoutPage() {
                                     <div className="grid gap-6 md:grid-cols-2">
                                         <div className="space-y-2">
                                             <Label htmlFor="firstName">First Name</Label>
-                                            <Input id="firstName" placeholder="Muhammad" className="h-11" />
+                                            <Input
+                                                id="firstName"
+                                                value={form.firstName}
+                                                onChange={(e) => update("firstName", e.target.value)}
+                                                placeholder="Muhammad"
+                                                className="h-11"
+                                            />
                                         </div>
                                         <div className="space-y-2">
                                             <Label htmlFor="lastName">Last Name</Label>
-                                            <Input id="lastName" placeholder="Talha" className="h-11" />
+                                            <Input
+                                                id="lastName"
+                                                value={form.lastName}
+                                                onChange={(e) => update("lastName", e.target.value)}
+                                                placeholder="Talha"
+                                                className="h-11"
+                                            />
                                         </div>
 
                                         <div className="space-y-2 md:col-span-2">
                                             <Label htmlFor="phone">Phone Number</Label>
-                                            <Input id="phone" placeholder="+92 3xx xxx xxxx" className="h-11" />
+                                            <Input
+                                                id="phone"
+                                                value={form.phone}
+                                                onChange={(e) => update("phone", e.target.value)}
+                                                placeholder="+92 3xx xxx xxxx"
+                                                className="h-11"
+                                            />
                                         </div>
 
                                         <div className="space-y-2 md:col-span-2">
                                             <Label htmlFor="email">Email (optional)</Label>
-                                            <Input id="email" type="email" placeholder="you@email.com" className="h-11" />
+                                            <Input
+                                                id="email"
+                                                type="email"
+                                                value={form.email}
+                                                onChange={(e) => update("email", e.target.value)}
+                                                placeholder="you@email.com"
+                                                className="h-11"
+                                            />
                                         </div>
 
                                         <div className="space-y-2 md:col-span-2">
                                             <Label htmlFor="address">Full Address</Label>
                                             <Textarea
                                                 id="address"
+                                                value={form.address}
+                                                onChange={(e) => update("address", e.target.value)}
                                                 placeholder="House no, street, area..."
                                                 className="min-h-[110px]"
                                             />
@@ -92,17 +300,33 @@ export default function CheckoutPage() {
 
                                         <div className="space-y-2">
                                             <Label htmlFor="city">City</Label>
-                                            <Input id="city" placeholder="Karachi" className="h-11" />
+                                            <Input
+                                                id="city"
+                                                value={form.city}
+                                                onChange={(e) => update("city", e.target.value)}
+                                                placeholder="Karachi"
+                                                className="h-11"
+                                            />
                                         </div>
                                         <div className="space-y-2">
                                             <Label htmlFor="postal">Postal Code (optional)</Label>
-                                            <Input id="postal" placeholder="75500" className="h-11" />
+                                            <Input
+                                                id="postal"
+                                                value={form.postal}
+                                                onChange={(e) => update("postal", e.target.value)}
+                                                placeholder="75500"
+                                                className="h-11"
+                                            />
                                         </div>
                                     </div>
 
                                     <div className="space-y-4">
                                         <p className="text-sm font-semibold text-zinc-900">Payment Method</p>
-                                        <RadioGroup defaultValue="cod" className="grid gap-3">
+                                        <RadioGroup
+                                            value={form.paymentMethod}
+                                            onValueChange={(v) => update("paymentMethod", v as PaymentMethod)}
+                                            className="grid gap-3"
+                                        >
                                             <label className="flex cursor-pointer items-center justify-between rounded-2xl border p-4">
                                                 <div className="flex items-center gap-3">
                                                     <RadioGroupItem value="cod" id="cod" />
@@ -139,61 +363,40 @@ export default function CheckoutPage() {
                                         <CardTitle>Order Summary</CardTitle>
                                     </CardHeader>
                                     <CardContent className="space-y-5">
-                                        <div className="flex items-center gap-4">
-                                            <div className="relative h-16 w-16 overflow-hidden rounded-xl bg-zinc-50">
-                                                <Image
-                                                    src="/images/products/p1.jpg"
-                                                    alt="Watch"
-                                                    fill
-                                                    className="object-cover"
-                                                />
-                                            </div>
-                                            <div className="flex-1">
-                                                <p className="text-sm font-medium text-zinc-900">
-                                                    Classic Chrono Black Dial
+                                        {cart.map((item) => (
+                                            <div key={item.id} className="flex items-center gap-4">
+                                                <div className="relative h-16 w-16 overflow-hidden rounded-xl bg-zinc-50">
+                                                    <Image src={safeImage(item.imageUrl)} alt={item.name} fill className="object-cover" />
+                                                </div>
+                                                <div className="flex-1">
+                                                    <p className="text-sm font-medium text-zinc-900">{item.name}</p>
+                                                    <p className="text-xs text-zinc-600">Qty: {item.qty}</p>
+                                                </div>
+                                                <p className="text-sm font-semibold text-zinc-900">
+                                                    {formatPKR(item.price * item.qty)}
                                                 </p>
-                                                <p className="text-xs text-zinc-600">Qty: 1</p>
                                             </div>
-                                            <p className="text-sm font-semibold text-zinc-900">₨ 4,999</p>
-                                        </div>
-
-                                        <div className="flex items-center gap-4">
-                                            <div className="relative h-16 w-16 overflow-hidden rounded-xl bg-zinc-50">
-                                                <Image
-                                                    src="/images/products/p2.jpg"
-                                                    alt="Watch"
-                                                    fill
-                                                    className="object-cover"
-                                                />
-                                            </div>
-                                            <div className="flex-1">
-                                                <p className="text-sm font-medium text-zinc-900">
-                                                    Minimal Silver White Dial
-                                                </p>
-                                                <p className="text-xs text-zinc-600">Qty: 1</p>
-                                            </div>
-                                            <p className="text-sm font-semibold text-zinc-900">₨ 4,999</p>
-                                        </div>
+                                        ))}
 
                                         <div className="border-t pt-4 space-y-2 text-sm text-zinc-700">
                                             <div className="flex justify-between">
                                                 <span>Subtotal</span>
-                                                <span>₨ 9,998</span>
+                                                <span>{formatPKR(subtotal)}</span>
                                             </div>
                                             <div className="flex justify-between">
                                                 <span>Shipping</span>
-                                                <span>Free</span>
+                                                <span>{cart.length ? formatPKR(SHIPPING_FEE) : formatPKR(0)}</span>
                                             </div>
                                         </div>
 
                                         <div className="border-t pt-4 flex items-center justify-between">
                                             <span className="text-sm font-semibold text-zinc-900">Total</span>
-                                            <span className="text-lg font-semibold text-zinc-900">₨ 9,998</span>
+                                            <span className="text-lg font-semibold text-zinc-900">{formatPKR(total)}</span>
                                         </div>
 
-                                        <Link href="/payment-confirmation">
-                                            <Button className="h-11 w-full rounded-xl">Place Order</Button>
-                                        </Link>
+                                        <Button className="h-11 w-full rounded-xl" onClick={placeOrder} disabled={placing || cart.length === 0}>
+                                            {placing ? "Placing..." : "Place Order"}
+                                        </Button>
 
                                         <Button asChild variant="outline" className="h-11 mt-3 w-full rounded-xl">
                                             <Link href="/cart">Back to Cart</Link>
@@ -207,9 +410,7 @@ export default function CheckoutPage() {
 
                                 <div className="rounded-2xl border bg-zinc-50 p-5">
                                     <p className="text-sm font-semibold text-zinc-900">Need help?</p>
-                                    <p className="mt-1 text-sm text-zinc-600">
-                                        Contact us for order updates or product questions.
-                                    </p>
+                                    <p className="mt-1 text-sm text-zinc-600">Contact us for order updates or product questions.</p>
                                     <div className="mt-4 flex gap-2">
                                         <Button asChild variant="outline" className="rounded-xl">
                                             <Link href="/contact">Contact</Link>
@@ -225,5 +426,5 @@ export default function CheckoutPage() {
                 </section>
             </div>
         </UserWrapper>
-    );
+    )
 }

@@ -1,232 +1,235 @@
+"use client"
+
+import * as React from "react"
 import Image from "next/image"
 import Link from "next/link"
+import axios from "axios"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Card, CardContent } from "@/components/ui/card"
-import {
-    Star,
-    Truck,
-    ShieldCheck,
-    RefreshCcw,
-    Heart,
-} from "lucide-react"
+import { Spinner } from "@/components/ui/spinner"
+import { Star, Truck, ShieldCheck, RefreshCcw } from "lucide-react"
 import UserWrapper from "@/app/(wrappers)/userWrapper"
 
-export default function ProductDetailsPage() {
+type Product = {
+    _id: string
+    name: string
+    slug: string
+    price: number
+    oldPrice?: number | null
+    category: string
+    collection: string
+    description?: string
+    imageUrl?: string
+    status: "published" | "draft"
+    inStock: boolean
+}
+
+type CartItem = {
+    id: string
+    slug: string
+    name: string
+    price: number
+    imageUrl: string
+    qty: number
+}
+
+/* ---------- helpers (same as shop page) ---------- */
+
+function safeImage(url?: string) {
+    return url?.trim() ? url : "/images/placeholder.png"
+}
+
+function formatPKR(n: number) {
+    const v = Number.isFinite(n) ? n : 0
+    return `Rs.${v.toLocaleString("en-US")}.00`
+}
+
+function readCart(): CartItem[] {
+    try {
+        const raw = localStorage.getItem("cart")
+        if (!raw) return []
+        const parsed = JSON.parse(raw)
+        return Array.isArray(parsed) ? parsed : []
+    } catch {
+        return []
+    }
+}
+
+function writeCart(items: CartItem[]) {
+    localStorage.setItem("cart", JSON.stringify(items))
+}
+
+function addToCart(item: Omit<CartItem, "qty">) {
+    const cart = readCart()
+    const idx = cart.findIndex((x) => x.id === item.id)
+
+    if (idx >= 0) {
+        cart[idx].qty += 1
+    } else {
+        cart.push({ ...item, qty: 1 })
+    }
+
+    writeCart(cart)
+}
+
+function isInCart(id: string) {
+    return readCart().some((x) => x.id === id)
+}
+
+/* ---------- page ---------- */
+
+export default function ProductDetailsPage({
+    params,
+}: {
+    params: Promise<{ slug: string }>
+}) {
+    const { slug } = React.use(params)
+
+
+    const [loading, setLoading] = React.useState(true)
+    const [product, setProduct] = React.useState<Product | null>(null)
+    const [added, setAdded] = React.useState(false)
+
+    React.useEffect(() => {
+        const fetchProduct = async () => {
+            try {
+                setLoading(true)
+
+                const res = await axios.get("/api/admin/products")
+                const products: Product[] = res.data?.products || []
+
+                const found = products.find(
+                    (p) => p.slug === slug && p.status === "published"
+                )
+
+                if (!found) {
+                    setProduct(null)
+                    return
+                }
+
+                setProduct(found)
+                setAdded(isInCart(found._id))
+            } catch {
+                toast("Failed to load product")
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        fetchProduct()
+    }, [slug])
+
+    const handleAdd = () => {
+        if (!product) return
+
+        if (added) {
+            window.location.href = "/cart"
+            return
+        }
+
+        addToCart({
+            id: product._id,
+            slug: product.slug,
+            name: product.name,
+            price: product.price,
+            imageUrl: safeImage(product.imageUrl),
+        })
+
+        setAdded(true)
+        toast("Added to cart")
+    }
+
     return (
         <UserWrapper>
             <div className="min-h-screen bg-white">
                 {/* Breadcrumb */}
                 <section className="border-b bg-zinc-50">
                     <div className="mx-auto max-w-7xl px-4 py-4 text-sm text-zinc-600">
-                        <Link href="/" className="hover:underline">Home</Link> /{" "}
-                        <Link href="/shop" className="hover:underline">Shop</Link> /{" "}
+                        <Link href="/">Home</Link> / <Link href="/shop">Shop</Link> /{" "}
                         <span className="text-zinc-900 font-medium">
-                            Classic Chrono Black Dial
+                            {product?.name || "Product"}
                         </span>
                     </div>
                 </section>
 
-                {/* Product */}
-                <section className="py-12">
-                    <div className="mx-auto max-w-7xl px-4 grid gap-10 items-center lg:grid-cols-2">
-                        {/* Images */}
-                        <div className="space-y-4">
-                            <div className="relative aspect-square w-full overflow-hidden rounded-2xl border bg-zinc-50">
+                {loading ? (
+                    <div className="flex justify-center py-20">
+                        <Spinner />
+                    </div>
+                ) : !product ? (
+                    <div className="text-center py-24">
+                        <h2 className="text-2xl font-semibold">Product not found</h2>
+                        <p className="text-zinc-600 mt-2">
+                            This product may be removed or unpublished.
+                        </p>
+                        <Button asChild className="mt-6">
+                            <Link href="/shop">Back to shop</Link>
+                        </Button>
+                    </div>
+                ) : (
+                    <section className="py-12">
+                        <div className="mx-auto max-w-7xl px-4 grid gap-10 lg:grid-cols-2">
+                            {/* Image */}
+                            <div className="relative aspect-square rounded-2xl overflow-hidden bg-zinc-50">
                                 <Image
-                                    src="/images/products/p1.jpg"
-                                    alt="Watch"
+                                    src={safeImage(product.imageUrl)}
+                                    alt={product.name}
                                     fill
                                     className="object-cover"
                                 />
                             </div>
-                        </div>
 
-                        {/* Info */}
-                        <div className="space-y-6">
-                            <Badge variant="secondary" className="rounded-full px-4 py-1">
-                                Men Watch
-                            </Badge>
+                            {/* Info */}
+                            <div className="space-y-6">
+                                <Badge>{product.category}</Badge>
 
-                            <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl">
-                                Classic Chrono Black Dial
-                            </h1>
+                                <h1 className="text-3xl font-semibold">{product.name}</h1>
 
-                            <div className="flex items-center gap-2">
-                                {[1, 2, 3, 4, 5].map((i) => (
-                                    <Star key={i} className="h-4 w-4 fill-zinc-900 text-zinc-900" />
-                                ))}
-                                <span className="text-sm text-zinc-600">(124 reviews)</span>
-                            </div>
-
-                            <div className="flex items-end gap-3">
-                                <p className="text-3xl font-semibold text-zinc-900">₨ 4,999</p>
-                                <p className="pb-1 text-sm text-zinc-500 line-through">₨ 6,499</p>
-                            </div>
-
-                            <p className="max-w-xl text-base leading-relaxed text-zinc-600">
-                                A premium stainless steel watch with a classic black dial,
-                                water-resistant build, and comfortable strap — perfect for daily
-                                wear and formal occasions.
-                            </p>
-
-                            {/* Actions */}
-                            <div className="flex flex-col gap-3 sm:flex-row">
-                                <Button className="h-11 rounded-xl w-full px-6">
-                                    Add to Cart
-                                </Button>
-                                {/* <Button variant="outline" className="h-11 rounded-xl px-6">
-                                    <Heart className="mr-2 h-4 w-4" />
-                                    Wishlist
-                                </Button> */}
-                            </div>
-
-                            {/* Features */}
-                            <div className="grid gap-4 sm:grid-cols-3 pt-4">
-                                <div className="flex items-start gap-3">
-                                    <Truck className="h-5 w-5 text-zinc-900" />
-                                    <p className="text-sm text-zinc-700">
-                                        Fast delivery within 2–5 working days
-                                    </p>
+                                <div className="flex gap-1">
+                                    {[1, 2, 3, 4, 5].map((i) => (
+                                        <Star key={i} className="h-4 w-4 fill-black" />
+                                    ))}
                                 </div>
-                                <div className="flex items-start gap-3">
-                                    <ShieldCheck className="h-5 w-5 text-zinc-900" />
-                                    <p className="text-sm text-zinc-700">
-                                        1 year warranty included
+
+                                <div className="flex gap-3 items-end">
+                                    <p className="text-3xl font-bold">
+                                        {formatPKR(product.price)}
                                     </p>
+                                    {product.oldPrice && (
+                                        <p className="line-through text-zinc-500">
+                                            {formatPKR(product.oldPrice)}
+                                        </p>
+                                    )}
                                 </div>
-                                <div className="flex items-start gap-3">
-                                    <RefreshCcw className="h-5 w-5 text-zinc-900" />
-                                    <p className="text-sm text-zinc-700">
-                                        7 days easy return policy
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
 
-                {/* Details */}
-                {/* <section className="border-t py-12">
-                    <div className="mx-auto max-w-7xl px-4 grid gap-8 lg:grid-cols-3">
-                        <Card className="rounded-2xl">
-                            <CardContent className="p-6">
-                                <p className="text-sm text-zinc-500">Material</p>
-                                <p className="text-sm font-semibold text-zinc-900">
-                                    Stainless Steel
+                                <p className="text-zinc-600">
+                                    {product.description || "No description available."}
                                 </p>
-                            </CardContent>
-                        </Card>
 
-                        <Card className="rounded-2xl">
-                            <CardContent className="p-6">
-                                <p className="text-sm text-zinc-500">Movement</p>
-                                <p className="text-sm font-semibold text-zinc-900">
-                                    Quartz
-                                </p>
-                            </CardContent>
-                        </Card>
-
-                        <Card className="rounded-2xl">
-                            <CardContent className="p-6">
-                                <p className="text-sm text-zinc-500">Water Resistance</p>
-                                <p className="text-sm font-semibold text-zinc-900">
-                                    5 ATM
-                                </p>
-                            </CardContent>
-                        </Card>
-                    </div>
-                </section> */}
-
-                {/* Description */}
-                <section className="bg-zinc-50 py-12">
-                    <div className="mx-auto max-w-4xl px-4 space-y-4">
-                        <h2 className="text-2xl font-semibold text-zinc-900">
-                            Product Description
-                        </h2>
-                        <p className="text-base leading-relaxed text-zinc-600">
-                            This watch is designed for durability and elegance. Crafted with
-                            premium stainless steel, it features a scratch-resistant glass,
-                            accurate quartz movement, and a water-resistant build suitable for
-                            everyday use. A perfect balance of style and reliability.
-                        </p>
-                    </div>
-                </section>
-
-                <section className="border-t bg-white py-14">
-                    <div className="mx-auto max-w-7xl px-4">
-                        <div className="flex items-end justify-between">
-                            <div>
-                                <h2 className="text-2xl font-semibold tracking-tight text-zinc-900">
-                                    Related Watches
-                                </h2>
-                                <p className="mt-1 text-sm text-zinc-600">
-                                    You might also like these styles
-                                </p>
-                            </div>
-
-                            <Link
-                                href="/shop"
-                                className="hidden text-sm font-medium text-zinc-900 hover:underline sm:block"
-                            >
-                                View all
-                            </Link>
-                        </div>
-
-                        <div className="mt-8 grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                            {[1, 2, 3, 4].map((item) => (
-                                <div
-                                    key={item}
-                                    className="group overflow-hidden rounded-2xl border bg-white transition hover:shadow-lg"
+                                <Button
+                                    onClick={handleAdd}
+                                    className="h-11 rounded-xl w-full"
+                                    disabled={!product.inStock}
                                 >
-                                    <div className="relative aspect-square overflow-hidden bg-zinc-50">
-                                        <img
-                                            src={`/images/products/p${item}.jpg`}
-                                            alt="Related watch"
-                                            className="h-full w-full object-cover transition group-hover:scale-105"
-                                        />
+                                    {added ? "View Cart" : "Add to Cart"}
+                                </Button>
+
+                                <div className="grid grid-cols-3 gap-4 pt-4">
+                                    <div className="flex gap-2 text-sm">
+                                        <Truck /> Fast Delivery
                                     </div>
-
-                                    <div className="space-y-3 p-4">
-                                        <span className="inline-block rounded-full bg-zinc-100 px-3 py-1 text-xs text-zinc-700">
-                                            Men Watch
-                                        </span>
-
-                                        <h3 className="text-sm font-medium text-zinc-900 line-clamp-2">
-                                            Premium Minimal Chrono Watch
-                                        </h3>
-
-                                        <div className="flex items-center justify-between">
-                                            {/* <p className="text-sm font-semibold text-zinc-900">
-                                                ₨ 4,499
-                                            </p> */}
-
-                                            <Button className="w-full">
-                                                <Link
-                                                    href={`/products/related-${item}`}
-                                                    className="w-full"
-                                                >
-                                                    View
-                                                </Link>
-                                            </Button>
-                                        </div>
+                                    <div className="flex gap-2 text-sm">
+                                        <ShieldCheck /> Warranty
+                                    </div>
+                                    <div className="flex gap-2 text-sm">
+                                        <RefreshCcw /> Easy Returns
                                     </div>
                                 </div>
-                            ))}
+                            </div>
                         </div>
-
-                        <div className="mt-8 text-center sm:hidden">
-                            <Link
-                                href="/shop"
-                                className="text-sm font-medium text-zinc-900 underline underline-offset-4"
-                            >
-                                View all watches
-                            </Link>
-                        </div>
-                    </div>
-                </section>
-
-
+                    </section>
+                )}
             </div>
         </UserWrapper>
     )

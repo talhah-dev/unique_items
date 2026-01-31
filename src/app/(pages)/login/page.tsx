@@ -3,37 +3,50 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import axios from "axios"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
+import { Spinner } from "@/components/ui/spinner"
 import { Eye, EyeOff, Shield } from "lucide-react"
-
-const ADMIN_EMAIL = "admin@uniqueitems.com"
-const ADMIN_PASSWORD = "1234"
 
 export default function AdminLoginPage() {
     const router = useRouter()
     const [email, setEmail] = React.useState("")
     const [password, setPassword] = React.useState("")
     const [showPassword, setShowPassword] = React.useState(false)
-    const [error, setError] = React.useState<string | null>(null)
+    const [loading, setLoading] = React.useState(false)
 
-    const onSubmit = (e: React.FormEvent) => {
+    // create admin
+
+    // fetch("/api/admin/seed", {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify({ secret: "some-very-long-secret" })
+    // }).then(r => r.json()).then(console.log)
+
+
+    const onSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        setError(null)
 
-        const ok =
-            email.trim().toLowerCase() === ADMIN_EMAIL &&
-            password.trim() === ADMIN_PASSWORD
+        try {
+            setLoading(true)
+            await axios.post("/api/admin/login", {
+                email: email.trim(),
+                password: password.trim(),
+            })
 
-        if (!ok) {
-            setError("Invalid admin credentials.")
-            return
+            toast("Login successful.")
+            router.push("/admin")
+            router.refresh()
+        } catch (err: any) {
+            toast(err?.response?.data?.message || "Login failed")
+        } finally {
+            setLoading(false)
         }
-
-        router.push("/admin")
     }
 
     return (
@@ -54,8 +67,7 @@ export default function AdminLoginPage() {
                         </h1>
 
                         <p className="mt-4 max-w-md text-base leading-relaxed text-zinc-600">
-                            This page is restricted for administrators. Please sign in to manage
-                            products, orders, and website content.
+                            This page is restricted for administrators. Please sign in to manage products, orders, and website content.
                         </p>
 
                         <div className="mt-10 flex items-center gap-3">
@@ -74,18 +86,10 @@ export default function AdminLoginPage() {
                     <Card className="rounded-3xl">
                         <CardHeader>
                             <CardTitle className="text-2xl">Admin Login</CardTitle>
-                            <CardDescription>
-                                Sign in to access the admin dashboard.
-                            </CardDescription>
+                            <CardDescription>Sign in to access the admin dashboard.</CardDescription>
                         </CardHeader>
 
                         <CardContent className="space-y-6">
-                            {error && (
-                                <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                                    {error}
-                                </div>
-                            )}
-
                             <form onSubmit={onSubmit} className="space-y-5">
                                 <div className="space-y-2">
                                     <Label htmlFor="email">Admin Email</Label>
@@ -118,17 +122,13 @@ export default function AdminLoginPage() {
                                             className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-900"
                                             aria-label={showPassword ? "Hide password" : "Show password"}
                                         >
-                                            {showPassword ? (
-                                                <EyeOff className="h-4 w-4" />
-                                            ) : (
-                                                <Eye className="h-4 w-4" />
-                                            )}
+                                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                         </button>
                                     </div>
                                 </div>
 
-                                <Button type="submit" className="h-11 w-full rounded-xl">
-                                    Login
+                                <Button type="submit" className="h-11 w-full rounded-xl" disabled={loading}>
+                                    {loading ? <Spinner /> : "Login"}
                                 </Button>
                             </form>
 
